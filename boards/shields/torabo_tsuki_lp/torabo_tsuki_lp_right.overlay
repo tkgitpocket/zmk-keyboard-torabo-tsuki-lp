@@ -1,9 +1,19 @@
 #include "torabo_tsuki_lp.dtsi"
 #include <input/processors.dtsi>
 #include <dt-bindings/zmk/input_transform.h>
+#include <scroll-snap.dtsi> // スクロールスナップ ZMK Scroll Snap Module(https://github.com/kot149/zmk-scroll-snap)を使う
 
 &pointing_listener {
     input-processors = <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)>;
+
+    scroller {
+        layers = <7>;
+        input-processors =
+            <&zip_xy_to_scroll_mapper>,
+            <&zip_scroll_snap>, // スクロールスナップ機能を入れる
+            <&zip_scroll_transform INPUT_TRANSFORM_Y_INVERT>, // スクロール方向をWindowsに合わせる
+            <&zip_scroll_scaler 1 8>; // スクロール速度を遅くする(2/5→1/8)
+    };
 };
 
 &size_s_transform {
