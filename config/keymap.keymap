@@ -24,18 +24,7 @@
 #define JP_BSLH         INT1              // (backslash)
 
 // Layer definitions
-
-#define DEFAULT_L		0
-#define WINDOWS_L		1
-#define MAC_L			2
-#define IOS_L			3
-#define LEFT_L	 		4
-#define RIGHT_L			5
-#define TRACKBALL_L		6
-#define SCROLL_L		7
-#define CENTER_L		8
-#define CENTER2_L		9
-#define BT_L			10
+#include "layers.dtsi"
 
 // ZMK Layout Shift モジュール(https://github.com/kot149/zmk-layout-shift/blob/v1/README_ja.md)を使う
 // &kpをオーバーライド
