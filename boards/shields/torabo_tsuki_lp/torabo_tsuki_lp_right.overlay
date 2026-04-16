@@ -9,20 +9,12 @@
         <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)>,
         <&zip_xy_scaler 1 2>; // カーソル移動速度を遅くする
 
-    // left_layerではカーソル遅くする
+    // カーソル遅くする
     slow_cursor {
-        layers = <LEFT_L>;
+        layers = <SLOWTRACKBALL_L>;
         input-processors =
             <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)>,
             <&zip_xy_scaler 1 6>;
-    };
-
-    // center_layerではカーソル早くする
-    fast_cursor {
-        layers = <CENTER_L>;
-        input-processors =
-            <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)>,
-            <&zip_xy_scaler 4 5>;
     };
 
     scroller {
@@ -36,7 +28,7 @@
 
     // 高速スクロール
     fast_scroller {
-        layers = <RIGHT_L>;
+        layers = <FASTRSCROLL_L>;
         input-processors =
             <&zip_xy_to_scroll_mapper>,
             <&zip_scroll_snap>, // スクロールスナップ機能を入れる

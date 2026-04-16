@@ -185,8 +185,8 @@
             bindings = <
 &none           &none      &none         &none         &none                  &none                                                        &none      &none  &none      &none         &none                  &none
 &kp ESCAPE      &kp Q      &kp W         &kp E         &kp R                  &kp T                                                        &kp Y      &kp U  &kp I      &kp O         &kp P                  &kp JP_YEN
-&mt LCTRL TAB   &kp A      &kp S         &kp D         &kp F                  &kp G               &none                     &none          &kp H      &kp J  &kp K      &mt LCTRL L   &lt SCROLL_L MINUS     &kp JP_UNDERSCORE
-&kp LEFT_SHIFT  &kp Z      &kp X         &kp C         &kp V                  &kp B               &kp B                     &kp JP_TILDE   &kp N      &kp M  &mkp LCLK  &mkp RCLK     &mt RIGHT_SHIFT SLASH  &kp RIGHT_SHIFT
+&mt LCTRL TAB   &kp A      &kp S         &kp D         &kp F                  &kp G               &none                     &none          &kp H      &kp J  &kp K      &mt LCTRL L   &lt SCROLL_L MINUS     &lt FASTRSCROLL_L JP_UNDERSCORE
+&kp LEFT_SHIFT  &kp Z      &kp X         &kp C         &kp V                  &kp B               &lt SLOWTRACKBALL_L B     &kp JP_TILDE   &kp N      &kp M  &mkp LCLK  &mkp RCLK     &mt RIGHT_SHIFT SLASH  &kp RIGHT_SHIFT
 &kp LCTRL       &kp LCTRL  &kp LEFT_WIN  &kp LEFT_ALT  &lt LEFT_L INT_HENKAN  &lt CENTER_L SPACE  &lt RIGHT_L INT_MUHENKAN  &kp BACKSPACE  &kp ENTER  &none  &none      &kp QUESTION  &kp RIGHT_GUI          &kp RCTRL
             >;
         };
@@ -247,11 +247,22 @@
         };
 
         trackball_layer {
-            display-name = "Trackball Automouse";
+            display-name = "Trackball";
             bindings = <
 &trans  &trans  &trans  &trans  &trans  &trans                  &trans  &trans    &trans     &trans     &trans        &trans
 &trans  &trans  &trans  &trans  &trans  &trans                  &trans  &mkp MB4  &mkp MB3   &mkp MB5   &trans        &trans
-&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans    &mkp LCLK  &mkp RCLK  &mo SCROLL_L  &mo SCROLL_L
+&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans    &mkp LCLK  &mkp RCLK  &mo SCROLL_L  &mo FASTRSCROLL_L
+&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans    &mkp LCLK  &mkp RCLK  &trans        &trans
+&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans    &trans     &trans     &trans        &trans
+            >;
+        };
+
+        slow_trackball_layer {
+            display-name = "Slow Trackball";
+            bindings = <
+&trans  &trans  &trans  &trans  &trans  &trans                  &trans  &trans    &trans     &trans     &trans        &trans
+&trans  &trans  &trans  &trans  &trans  &trans                  &trans  &mkp MB4  &mkp MB3   &mkp MB5   &trans        &trans
+&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans    &mkp LCLK  &mkp RCLK  &mo SCROLL_L  &mo FASTRSCROLL_L
 &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans    &mkp LCLK  &mkp RCLK  &trans        &trans
 &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans    &trans     &trans     &trans        &trans
             >;
@@ -259,6 +270,17 @@
 
         scroll_layer {
             display-name = "Trackball Scroll";
+            bindings = <
+&trans  &trans  &trans  &trans  &trans  &trans                  &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans  &trans                  &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
+            >;
+        };
+
+        fast_scroll_layer {
+            display-name = "Trackball Fast Scroll";
             bindings = <
 &trans  &trans  &trans  &trans  &trans  &trans                  &trans  &trans  &trans  &trans  &trans  &trans
 &trans  &trans  &trans  &trans  &trans  &trans                  &trans  &trans  &trans  &trans  &trans  &trans
@@ -292,11 +314,11 @@
 
         Bluetooth {
             bindings = <
-&trans  &trans  &trans  &trans  &trans  &trans                  &trans     &trans     &trans     &trans     &trans     &trans
-&trans  &trans  &trans  &trans  &trans  &trans                  &out_bt_0  &out_bt_1  &out_bt_2  &out_bt_3  &out_bt_4  &trans
-&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans     &trans     &trans     &trans     &trans     &trans
-&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans     &trans     &trans     &trans     &trans     &trans
-&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans     &trans     &trans     &trans     &trans     &trans
+&trans  &trans  &trans  &trans  &trans  &trans                             &trans     &trans     &trans     &trans     &trans     &trans
+&trans  &trans  &trans  &trans  &trans  &trans                             &out_bt_0  &out_bt_1  &out_bt_2  &out_bt_3  &out_bt_4  &trans
+&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans             &trans     &trans     &trans     &trans     &trans     &trans
+&trans  &trans  &trans  &trans  &trans  &trans  &trans  &kp RC(RA(DELETE)) &trans     &trans     &trans     &trans     &trans     &trans
+&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans             &trans     &trans     &trans     &trans     &trans     &trans
             >;
         };
     };
