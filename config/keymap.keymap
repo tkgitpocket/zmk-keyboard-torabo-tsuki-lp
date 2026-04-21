@@ -24,6 +24,7 @@
 #define JP_BSLH         INT1              // (backslash)
 
 // Layer definitions
+
 #include "layers.dtsi"
 
 // ZMK Layout Shift モジュール(https://github.com/kot149/zmk-layout-shift/blob/v1/README_ja.md)を使う
@@ -227,22 +228,22 @@
         left_layer {
             display-name = "Left SPACE";
             bindings = <
-&trans          &trans           &trans              &trans        &trans           &trans                                        &trans            &trans         &trans          &trans           &trans            &trans
-&kp EXCLAMATION &kp EXCLAMATION  &kp JP_DQUOTE       &kp HASH      &kp DOLLAR       &kp PERCENT                                   &kp JP_AMPERSAND  &kp JP_QUOTE   &kp JP_LPAREN   &kp JP_RPAREN    &kp JP_PIPE       &kp JP_BSLH
-&trans          &kp LCTRL        &kp SEMICOLON       &kp JP_COLON  &kp JP_LBRACE    &kp JP_RBRACE  &trans           &trans        &kp JP_CARET      &kp JP_AT      &kp JP_LBRACKET &kp JP_RBRACKET  &kp JP_EQUAL      &kp JP_EQUAL
-&kp JP_EQUAL    &trans           &mt LEFT_SHIFT TAB  &kp JP_PLUS   &kp JP_ASTERISK  &kp JP_TILDE   &kp PRINTSCREEN  &kp JP_CARET  &kp SEMICOLON     &kp JP_COLON   &kp LESS_THAN   &kp GREATER_THAN &kp JP_TILDE      &kp RIGHT_SHIFT
-&trans          &trans           &trans              &trans        &trans           &trans         &trans           &kp RCTRL     &trans            &trans         &trans          &trans           &trans            &trans
+&trans           &trans           &trans              &trans        &trans           &trans                                        &trans            &trans        &trans           &trans            &trans        &trans
+&kp EXCLAMATION  &kp EXCLAMATION  &kp JP_DQUOTE       &kp HASH      &kp DOLLAR       &kp PERCENT                                   &kp JP_AMPERSAND  &kp JP_QUOTE  &kp JP_LPAREN    &kp JP_RPAREN     &kp JP_PIPE   &kp JP_BSLH
+&trans           &kp LCTRL        &kp SEMICOLON       &kp JP_COLON  &kp JP_LBRACE    &kp JP_RBRACE  &trans           &trans        &kp JP_CARET      &kp JP_AT     &kp JP_LBRACKET  &kp JP_RBRACKET   &kp JP_EQUAL  &kp JP_EQUAL
+&kp JP_EQUAL     &trans           &mt LEFT_SHIFT TAB  &kp JP_PLUS   &kp JP_ASTERISK  &kp JP_TILDE   &kp PRINTSCREEN  &kp JP_CARET  &kp SEMICOLON     &kp JP_COLON  &kp LESS_THAN    &kp GREATER_THAN  &kp JP_TILDE  &kp RIGHT_SHIFT
+&trans           &trans           &trans              &trans        &trans           &trans         &trans           &kp RCTRL     &trans            &trans        &trans           &trans            &trans        &trans
             >;
         };
 
         right_layer {
             display-name = "Right SPACE";
             bindings = <
-&trans        &trans        &trans        &trans        &trans        &trans                                  &trans        &trans           &trans        &trans        &trans             &trans
-&kp NUMBER_1  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp NUMBER_4  &kp NUMBER_5                            &kp NUMBER_6  &kp NUMBER_7     &kp NUMBER_8  &kp NUMBER_9  &kp NUMBER_0       &kp N0
-&trans        &none         &kp F2        &kp F3        &kp F4        &kp F5        &trans  &trans            &kp F6        &kp F7           &kp F8        &kp F9        &kp JP_UNDERSCORE  &trans
-&trans        &trans        &trans        &trans        &trans        &trans        &trans  &kp JP_BACKQUOTE  &kp JP_PLUS   &kp JP_ASTERISK  &kp COMMA     &kp PERIOD    &kp SLASH          &trans
-&trans        &trans        &trans        &trans        &trans        &trans        &trans  &trans            &trans        &trans           &trans        &trans        &trans             &trans
+&trans        &trans        &trans        &trans        &trans           &trans                                  &trans        &trans           &trans        &trans        &trans             &trans
+&kp NUMBER_1  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &kp NUMBER_4     &kp NUMBER_5                            &kp NUMBER_6  &kp NUMBER_7     &kp NUMBER_8  &kp NUMBER_9  &kp NUMBER_0       &kp N0
+&trans        &none         &kp F2        &kp F3        &kp F4           &kp F5        &trans  &trans            &kp F6        &kp F7           &kp F8        &kp F9        &kp JP_UNDERSCORE  &trans
+&trans        &trans        &trans        &trans        &kp LS(LC(TAB))  &kp LC(TAB)   &trans  &kp JP_BACKQUOTE  &kp JP_PLUS   &kp JP_ASTERISK  &kp COMMA     &kp PERIOD    &kp SLASH          &trans
+&trans        &trans        &trans        &trans        &trans           &trans        &trans  &trans            &trans        &trans           &trans        &trans        &trans             &trans
             >;
         };
 
@@ -314,11 +315,11 @@
 
         Bluetooth {
             bindings = <
-&trans  &trans  &trans  &trans  &trans  &trans                             &trans     &trans     &trans     &trans     &trans     &trans
-&trans  &trans  &trans  &trans  &trans  &trans                             &out_bt_0  &out_bt_1  &out_bt_2  &out_bt_3  &out_bt_4  &trans
-&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans             &trans     &trans     &trans     &trans     &trans     &trans
-&trans  &trans  &trans  &trans  &trans  &trans  &trans  &kp RC(RA(DELETE)) &trans     &trans     &trans     &trans     &trans     &trans
-&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans             &trans     &trans     &trans     &trans     &trans     &trans
+&trans  &trans  &trans  &trans  &trans  &trans                              &trans     &trans     &trans     &trans     &trans     &trans
+&trans  &trans  &trans  &trans  &trans  &trans                              &out_bt_0  &out_bt_1  &out_bt_2  &out_bt_3  &out_bt_4  &trans
+&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans              &trans     &trans     &trans     &trans     &trans     &trans
+&trans  &trans  &trans  &trans  &trans  &trans  &trans  &kp RC(RA(DELETE))  &trans     &trans     &trans     &trans     &trans     &trans
+&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans              &trans     &trans     &trans     &trans     &trans     &trans
             >;
         };
     };
