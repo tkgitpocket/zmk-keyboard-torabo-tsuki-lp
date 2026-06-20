@@ -185,7 +185,7 @@
         default {
             bindings = <
 &none           &none      &none         &none         &none                  &none                                                        &none      &none  &none      &none         &none                  &none
-&kp ESCAPE      &kp Q      &kp W         &kp E         &kp R                  &kp T                                                        &kp Y      &kp U  &kp I      &kp O         &kp P                  &kp JP_YEN
+&kp ESCAPE      &kp Q      &kp W         &kp E         &kp R                  &kp T                                                        &kp Y      &kp U  &kp I      &kp O         &kp P                  &lt SLOWSCROLL_L JP_YEN
 &mt LCTRL TAB   &kp A      &kp S         &kp D         &kp F                  &kp G               &none                     &none          &kp H      &kp J  &kp K      &mt LCTRL L   &lt SCROLL_L MINUS     &lt FASTRSCROLL_L JP_UNDERSCORE
 &kp LEFT_SHIFT  &kp Z      &kp X         &kp C         &kp V                  &kp B               &lt SLOWTRACKBALL_L B     &kp JP_TILDE   &kp N      &kp M  &mkp LCLK  &mkp RCLK     &mt RIGHT_SHIFT SLASH  &kp RIGHT_SHIFT
 &kp LCTRL       &kp LCTRL  &kp LEFT_WIN  &kp LEFT_ALT  &lt LEFT_L INT_HENKAN  &lt CENTER_L SPACE  &lt RIGHT_L INT_MUHENKAN  &kp BACKSPACE  &kp ENTER  &none  &none      &kp QUESTION  &kp QUESTION           &kp RCTRL
@@ -320,6 +320,18 @@
 &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans              &trans     &trans     &trans     &trans     &trans     &trans
 &trans  &trans  &trans  &trans  &trans  &trans  &trans  &kp RC(RA(DELETE))  &trans     &trans     &trans     &trans     &trans     &trans
 &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans              &trans     &trans     &trans     &trans     &trans     &trans
+            >;
+        };
+
+        // 低速スクロールレイヤー（¥キーホールドで起動）
+        slow_scroll_layer {
+            display-name = "Slow Scroll";
+            bindings = <
+&trans  &trans  &trans  &trans  &trans  &trans                  &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans  &trans                  &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
             >;
         };
     };

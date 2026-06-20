@@ -14,4 +14,5 @@
 #define CENTER_L         10
 #define CENTER2_L        11
 #define BT_L             12
+#define SLOWSCROLL_L     13
 
