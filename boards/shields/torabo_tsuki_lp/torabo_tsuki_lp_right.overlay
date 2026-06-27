@@ -23,7 +23,7 @@
             <&zip_xy_to_scroll_mapper>,
             <&zip_scroll_snap>, // スクロールスナップ機能を入れる
             <&zip_scroll_transform INPUT_TRANSFORM_X_INVERT>, // スクロール方向をWindowsに合わせる
-            <&zip_scroll_scaler 1 5>; // スクロール速度調整(Soa44では1/8)
+            <&zip_scroll_scaler 1 4>; // スクロール速度調整(Soa44では1/8)
     };
 
     // 低速スクロール（1/6 速度）
