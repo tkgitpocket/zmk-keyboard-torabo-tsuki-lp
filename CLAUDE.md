@@ -20,8 +20,8 @@ git push  # .github/workflows/build.yml を起動
 
 **書き込み先:**
 
-- `*_central` （左側・トラックボールがある方） → ポインティングデバイスが付いている半体に書き込む
-- `*_peripheral` （右側） → 反対側の半体に書き込む
+- `*_central` （右側・トラックボールがある方） → ポインティングデバイスが付いている半体に書き込む
+- `*_peripheral` （左側） → 反対側の半体に書き込む
 
 ## リポジトリ構成
 
@@ -34,8 +34,8 @@ config/
 boards/shields/torabo_tsuki_lp/
   torabo_tsuki_lp.dtsi          # 共通ハードウェア定義（GPIO マトリクス・SPI/I2C ピン・S/M/L レイアウト）
   torabo_tsuki_lp.keymap        # config/keymap.keymap をインクルードするだけの薄いラッパー
-  torabo_tsuki_lp_left.overlay  # 左（セントラル）— pointing_listener の入力プロセッサを設定
-  torabo_tsuki_lp_right.overlay # 右（ペリフェラル）— scroll-snap・レイヤー別入力設定を追加
+  torabo_tsuki_lp_left.overlay  # 左（ペリフェラル）— 最小限の XY 反転設定
+  torabo_tsuki_lp_right.overlay # 右（セントラル・トラックボール側）— pointing_listener の入力プロセッサ・scroll-snap・レイヤー別入力設定
   torabo_tsuki_lp_left.conf     # 左の Kconfig（ZMK Studio・BLE 送信電力・バッテリーProxy・スムーススクロール）
   torabo_tsuki_lp_right.conf    # 右の Kconfig（左と同内容）
   Kconfig.defconfig             # ZMK_SPLIT・SPI・INPUT・ZMK_MOUSE を有効化
@@ -59,7 +59,7 @@ src/
 
 ### 分割構成
 
-ワイヤレス分割ペア。左（セントラル）がホストへの BLE 接続を管理し、右（ペリフェラル）がキーイベントと必要に応じてポインティングデータを BLE でセントラルに送信する。
+ワイヤレス分割ペア。右（セントラル・トラックボール側）がホストへの BLE 接続を管理し、左（ペリフェラル）がキーイベントを BLE でセントラルに送信する。
 
 ポインティングデバイスの接続経路は、ビルド時に適用するスニペットの組み合わせで決まる。
 
