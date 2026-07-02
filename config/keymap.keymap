@@ -164,10 +164,10 @@
         default {
             bindings = <
 &none           &none      &none         &none         &none                  &none                                                        &none      &none  &none      &none         &none                  &none
-&kp ESCAPE      &kp Q      &kp W         &kp E         &kp R                  &kp T                                                        &kp Y      &kp U  &kp I      &kp O         &kp P                  &lt SLOWSCROLL_L BACKSLASH
-&mt LCTRL TAB   &kp A      &kp S         &kp D         &kp F                  &kp G               &none                     &none          &kp H      &kp J  &kp K      &mt LCTRL L   &lt SCROLL_L MINUS     &lt FASTRSCROLL_L UNDERSCORE
-&kp LEFT_SHIFT  &kp Z      &kp X         &kp C         &kp V                  &kp B               &lt SLOWTRACKBALL_L B     &kp TILDE      &kp N      &kp M  &mkp LCLK  &mkp RCLK     &mt RIGHT_SHIFT SLASH  &kp RIGHT_SHIFT
-&kp LCTRL       &kp LCTRL  &kp LEFT_WIN  &kp LEFT_ALT  &lt LEFT_L INT_HENKAN  &lt CENTER_L SPACE  &lt RIGHT_L INT_MUHENKAN  &kp BACKSPACE  &kp ENTER  &none  &none      &kp QUESTION  &kp QUESTION           &kp RCTRL
+&kp ESCAPE      &kp Q      &kp W         &kp E         &kp R          &kp T                                        &kp Y      &kp U  &kp I      &kp O         &kp P                  &lt 13 BACKSLASH
+&mt LCTRL TAB   &kp A      &kp S         &kp D         &kp F          &kp G          &none          &none          &kp H      &kp J  &kp K      &mt LCTRL L   &lt 8 MINUS            &lt 9 UNDERSCORE
+&kp LEFT_SHIFT  &kp Z      &kp X         &kp C         &kp V          &kp B          &lt 7 B        &kp TILDE      &kp N      &kp M  &mkp LCLK  &mkp RCLK     &mt RIGHT_SHIFT SLASH  &kp RIGHT_SHIFT
+&kp LCTRL       &kp LCTRL  &kp LEFT_WIN  &kp LEFT_ALT  &lt 4 INT_HENKAN  &lt 10 SPACE  &lt 5 INT_MUHENKAN  &kp BACKSPACE  &kp ENTER  &none  &none      &kp QUESTION  &kp QUESTION           &kp RCTRL
             >;
         };
 
@@ -189,7 +189,7 @@
 &trans  &trans  &trans  &trans        &trans      &trans                             &trans  &trans  &trans  &trans  &trans  &trans
 &trans  &trans  &trans  &trans        &trans      &trans  &trans             &trans  &trans  &trans  &trans  &trans  &trans  &trans
 &trans  &trans  &trans  &trans        &trans      &trans  &trans             &trans  &trans  &trans  &trans  &trans  &trans  &trans
-&trans  &trans  &trans  &kp LEFT_GUI  &lt LEFT_L  &trans  &lt RIGHT_L LANG2  &trans  &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &kp LEFT_GUI  &lt 4  &trans  &lt 5 LANG2  &trans  &trans  &trans  &trans  &trans  &trans  &trans
             >;
         };
 
@@ -200,7 +200,7 @@
 &trans  &trans  &trans  &trans        &trans      &trans                             &trans  &trans  &trans  &trans  &trans  &trans
 &trans  &trans  &trans  &trans        &trans      &trans  &trans             &trans  &trans  &trans  &trans  &trans  &trans  &trans
 &trans  &trans  &trans  &trans        &trans      &trans  &trans             &trans  &trans  &trans  &trans  &trans  &trans  &trans
-&trans  &trans  &trans  &kp LEFT_GUI  &lt LEFT_L  &trans  &lt RIGHT_L LANG2  &trans  &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &kp LEFT_GUI  &lt 4  &trans  &lt 5 LANG2  &trans  &trans  &trans  &trans  &trans  &trans  &trans
             >;
         };
 
@@ -231,7 +231,7 @@
             bindings = <
 &trans  &trans  &trans  &trans  &trans  &trans                  &trans  &trans    &trans     &trans     &trans        &trans
 &trans  &trans  &trans  &trans  &trans  &trans                  &trans  &mkp MB4  &mkp MB3   &mkp MB5   &trans        &trans
-&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans    &mkp LCLK  &mkp RCLK  &mo SCROLL_L  &mo FASTRSCROLL_L
+&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans    &mkp LCLK  &mkp RCLK  &mo 8  &mo 9
 &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans    &mkp LCLK  &mkp RCLK  &trans        &trans
 &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans    &trans     &trans     &trans        &trans
             >;
@@ -242,7 +242,7 @@
             bindings = <
 &trans  &trans  &trans  &trans  &trans  &trans                  &trans  &trans    &trans     &trans     &trans        &trans
 &trans  &trans  &trans  &trans  &trans  &trans                  &trans  &mkp MB4  &mkp MB3   &mkp MB5   &trans        &trans
-&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans    &mkp LCLK  &mkp RCLK  &mo SCROLL_L  &mo FASTRSCROLL_L
+&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans    &mkp LCLK  &mkp RCLK  &mo 8  &mo 9
 &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans    &mkp LCLK  &mkp RCLK  &trans        &trans
 &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans    &trans     &trans     &trans        &trans
             >;
@@ -274,7 +274,7 @@
             display-name = "Center SPACE";
             bindings = <
 &trans          &trans     &trans        &trans     &trans           &trans                                  &trans          &trans    &trans     &trans     &trans        &trans
-&trans          &kp TAB    &kp LEFT_ALT  &kp END    &lt BT_L SPACE   &kp PRINTSCREEN                         &kp LC(Y)       &mkp MB4  &mkp MB3   &mkp MB5   &kp UP_ARROW  &kp PAGE_UP
+&trans          &kp TAB    &kp LEFT_ALT  &kp END    &lt 12 SPACE   &kp PRINTSCREEN                         &kp LC(Y)       &mkp MB4  &mkp MB3   &mkp MB5   &kp UP_ARROW  &kp PAGE_UP
 &trans          &kp HOME   &kp LC(S)     &kp DEL    &kp RIGHT_ARROW  &kp LEFT_SHIFT   &trans  &trans         &kp BACKSPACE   &none     &none      &mkp LCLK  &mkp RCLK     &kp PAGE_DOWN
 &kp LEFT_SHIFT  &kp LC(Z)  &kp LC(X)     &kp LC(C)  &kp LC(V)        &kp LEFT_ARROW   &trans  &kp PAGE_DOWN  &kp DOWN_ARROW  &trans    &mkp LCLK  &mkp RCLK  &kp ENTER     &trans
 &trans          &trans     &trans        &trans     &trans           &trans           &trans  &kp RCTRL      &trans          &trans    &trans     &trans     &trans        &trans
@@ -285,7 +285,7 @@
             display-name = "Center SPACE(mac)";
             bindings = <
 &trans          &trans     &trans        &trans     &trans           &trans                                  &trans          &trans    &trans     &trans     &trans        &trans
-&trans          &kp TAB    &kp LEFT_ALT  &kp END    &lt BT_L SPACE   &kp PRINTSCREEN                         &kp LC(Y)       &mkp MB4  &mkp MB3   &mkp MB5   &kp UP_ARROW  &kp PAGE_UP
+&trans          &kp TAB    &kp LEFT_ALT  &kp END    &lt 12 SPACE   &kp PRINTSCREEN                         &kp LC(Y)       &mkp MB4  &mkp MB3   &mkp MB5   &kp UP_ARROW  &kp PAGE_UP
 &trans          &kp HOME   &kp LC(S)     &kp DEL    &kp RIGHT_ARROW  &kp LEFT_SHIFT   &trans  &trans         &kp BACKSPACE   &none     &none      &mkp LCLK  &mkp RCLK     &kp PAGE_DOWN
 &kp LEFT_SHIFT  &kp LC(Z)  &kp LC(X)     &kp LC(C)  &kp LC(V)        &kp LEFT_ARROW   &trans  &kp PAGE_DOWN  &kp DOWN_ARROW  &trans    &mkp LCLK  &mkp RCLK  &kp ENTER     &trans
 &trans          &trans     &trans        &trans     &trans           &trans           &trans  &kp RCTRL      &trans          &trans    &trans     &trans     &trans        &trans

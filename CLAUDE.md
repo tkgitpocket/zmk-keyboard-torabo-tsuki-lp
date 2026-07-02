@@ -103,6 +103,9 @@ src/
 | 10 | CENTER_L | ナビゲーション・クリップボード |
 | 11 | CENTER2_L | ナビゲーション・クリップボード（Mac 用） |
 | 12 | BT_L | Bluetooth プロファイル切り替え |
+| 13 | SLOWSCROLL_L | 低速スクロールモード |
+
+`config/keymap.keymap` 内の `&lt`/`&mo`/`&to` の第1引数は、[KeymapEditor](https://nickcoutsos.github.io/keymap-editor/) がCプリプロセッサを実行せず生テキストをそのまま解釈する仕様のため、上記マクロ名ではなく数値リテラルを直接記述している（`layers.dtsi` のマクロは右オーバーレイ側でのみ使用）。
 
 ### 電力管理（`src/board.c`）
 
