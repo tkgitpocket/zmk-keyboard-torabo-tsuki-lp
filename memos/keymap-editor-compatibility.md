@@ -1,7 +1,7 @@
 # KeymapEditor 互換性についての調査メモ
 
 > 作成: 2026-07-03
-> 状態: レイヤー番号の数値化は完了。保存(コミット)機能の安全性は未検証・要フォローアップ
+> 状態: レイヤー番号の数値化は完了。保存(コミット)機能は実機テストで安全性を確認済み
 
 ---
 
@@ -25,29 +25,25 @@
 - `LANG2` のような一部キーコードも同辞書に見当たらず `⊘` になる（`mac_default_layer`/`ios_default_layer` の `&lt RIGHT_L LANG2` で発生）。
 - ただし `&mkp`（マウスキー）は静的辞書には見当たらないにもかかわらず実際のスクリーンショットでは正常表示されていた。ユーザーが実際に使っている KeymapEditor のインスタンス／バージョンが手元で確認した `main` ブランチのコードと完全に一致しない可能性がある。**この辺りの挙動は推測込みであり、100%の確証はない。**
 
-### 3. 【重要・未解決】保存(コミット)機能を使うと独自devicetree定義が失われるおそれ
+### 3. 実機テストの結果: 保存(コミット)は安全だった（`main`ブランチのソース読解による懸念は外れ）
 
-`api/services/github/files.js` の `commitChanges` を見ると、KeymapEditorで保存すると:
+`nickcoutsos/keymap-editor` の `main` ブランチのソース（`api/services/github/files.js` の `commitChanges`）を読むと、`config/keymap.json` + `*.keymap.template`（無ければ最小テンプレート）から `config/keymap.keymap` を丸ごと再生成するように見えたため、combos・macros・behaviors・display-name・レイヤーノード名が失われるおそれを懸念していた。
 
-1. `config/keymap.json`（レイヤーのバインディング配列などの構造化データ）
-2. `config/*.keymap.template`（存在すれば。無ければ `api/services/zmk/defaults.js` の最小テンプレート）
+しかし `keymap-editor-test` ブランチで実際に「デフォルトレイヤーのBをAに変更して保存」を行ってもらったところ（コミット [`a7175dc`](https://github.com/tkgitpocket/zmk-keyboard-torabo-tsuki-lp/commit/a7175dcd6f7e0eb9c1e1e32e68fd5dd30c017713)）、実際の差分は:
 
-の2つから **`config/keymap.keymap` を丸ごと再生成**する。テンプレートの `{{rendered_layers}}` プレースホルダー部分だけがレイヤーのバインディングに置き換わり、それ以外は生テンプレートの内容がそのまま出力される。
+- 意図した `&kp B` → `&kp A` の変更
+- 触れたレイヤーのバインディング表の列幅の再フォーマット（空白の詰め直し）
+- `&tog_ls_on { ... };` の前後など、一部に空行が1つ追加
 
-本リポジトリには `*.keymap.template` が存在しないため、**現状のまま保存機能を使うと以下がすべて失われる**:
+のみで、**combos・macros・behaviors ブロック・`&tog_ls*` の設定・各レイヤーの `display-name`・レイヤーノード名はすべて変更されずに保持されていた**。`config/keymap.json` ファイルが新規作成されることもなかった。
 
-- `combos {}` ブロック（tab・shift_tab・mb4・mb5・semicolon・colon・comma・dot・mb3）
-- `macros {}` ブロック（`to_layer_0`・`out_bt_0`〜`out_bt_4`・`out_bt_nxt`）
-- `behaviors {}` ブロック（`&mt` override、`&kp` の layout-shift オーバーライド、`lt_to_layer_0`）
-- `&tog_ls` / `&tog_ls_on` / `&tog_ls_off` の `layout-maps` 設定
-- 各レイヤーの `display-name`（生成コードは `bindings` しか書き出さない模様）
-- 各レイヤーのノード名（`windows_default_layer` 等の命名。生成時は `default_layer` / `layer_<layer_names[i]>` という機械的な命名になり、現状の名前とは一致しない）
+→ 実際にホストされているサービスは、手元で読んだ `main` ブランチのテンプレート丸ごと再生成ロジックとは異なる（おそらくAST的に既存の `.keymap` を差分編集する）実装になっている可能性が高い。**「ソースコードを読んだ推測」より「実機での保存テスト結果」を信用するべき**、という教訓。
 
-### 対応方針（未着手）
+### 結論
 
-`*.keymap.template` を用意し `{{behaviour_includes}}` / `{{rendered_layers}}` プレースホルダーで現状の構造を保持する案が考えられるが、上記の「レイヤーノード名」「display-name」が生成ロジック側で決め打ちになっている点は `*.keymap.template` だけでは解決できない可能性が高い（`config/keymap.json` の `layer_names` 配列の内容次第で変わるため、そちらも要調整）。
-
-**保存機能を実際に使う前に、一度テスト用ブランチで「編集して保存」を試し、生成される `config/keymap.keymap` の差分を確認してから本運用するのが安全。**
+- KeymapEditorでの保存は通常利用で問題なさそう。保存のたびに列幅がわずかに変わったり空行が増減したりする程度の副作用はある（機能に影響なし）。
+- `*.keymap.template` の作成は不要と判断。
+- 念のため、大きな変更をKeymapEditorで保存した際は一度 `git diff` で意図しない変更が無いか確認する習慣を推奨。
 
 ## 関連
 
