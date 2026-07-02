@@ -34,6 +34,6 @@ manifest:
       revision: v1
     - name: zmk-layout-shift
       remote: kot149
-      revision: v1
+      revision: v2
   self:
     path: config

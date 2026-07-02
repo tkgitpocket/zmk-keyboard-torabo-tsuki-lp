@@ -84,7 +84,7 @@ src/
 
 ### キーマップ
 
-`config/keymap.keymap` で全レイヤーを定義。JP キーコードエイリアス（`JP_DQUOTE`・`JP_AT` 等）により、US キーコードから日本語キーボードレイアウトのスキャンコードへの対応を行う。
+`config/keymap.keymap` で全レイヤーを定義。記号キーは [zmk-layout-shift](https://github.com/kot149/zmk-layout-shift) の `layout_shift_map_us_to_jis` マップにより、US 配列前提のキーコード（`AT`・`DOUBLE_QUOTES` 等の標準キーコード）から JIS 配列 OS 向けのスキャンコードへ変換される。`&kp` は KeymapEditor 互換性のため `zmk,behavior-layout-shift-key-press` でオーバーライドしている。Bluetooth レイヤーに配置した `&tog_ls_on` を一度押すと変換が有効化され、以降は設定が永続化される。
 
 レイヤー定数は `config/layers.dtsi` で定義し、キーマップと右オーバーレイの両方から参照する。
 
@@ -122,7 +122,7 @@ src/
 | zmk-feature-cdc-acm-bootloader-trigger | sekigon-gonnoc v0.2 | USB ブートローダートリガー |
 | zmk-feature-non-lipo-battery-management | sekigon-gonnoc | 非 LiPo バッテリー ADC 管理 |
 | zmk-scroll-snap | kot149 v1 | スクロール軸ロック機能 |
-| zmk-layout-shift | kot149 v1 | レイアウト別キーオフセット |
+| zmk-layout-shift | kot149 v2 | US -> JIS 等のキーコード変換（実行時レイアウトシフト） |
 
 ## キーマップ編集
 
