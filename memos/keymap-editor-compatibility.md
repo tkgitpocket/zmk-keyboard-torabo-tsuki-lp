@@ -21,9 +21,17 @@
 
 ### 2. 独自behavior・一部キーコードはマクロを解決しても直らない
 
-- `&tog_ls_on` のような今回追加した独自 behavior は、KeymapEditor の `zmk-behaviors.json` に登録が無いため赤字+警告アイコンで表示される（辞書には `&kp &lt &mo &mt &to &tog &sk &sl &bt &bl &out &trans &none &caps_word &key_repeat &ext_power &bootloader &reset &rgb_ug` 程度しか無い模様）。西武 モジュール側の behavior はツールが認識できないので、これは表示上直しようがない。
-- `LANG2` のような一部キーコードも同辞書に見当たらず `⊘` になる（`mac_default_layer`/`ios_default_layer` の `&lt RIGHT_L LANG2` で発生）。
+- `&tog_ls_on` のような今回追加した独自 behavior は、KeymapEditor の `zmk-behaviors.json` に登録が無いため赤字+警告アイコンで表示される（辞書には `&kp &lt &mo &mt &to &tog &sk &sl &bt &bl &out &trans &none &caps_word &key_repeat &ext_power &bootloader &reset &rgb_ug` 程度しか無い模様）。外部モジュール側の behavior はツールが認識できないので、これは表示上直しようがない。
+- `LANG2` のような一部キーコードも同辞書に見当たらず `⊘` になる（`mac_default_layer`/`ios_default_layer` の `&lt RIGHT_L LANG2` で発生）。ZMKの正式名（エイリアスではない方）`LANGUAGE_2` に変更したところ解決した。同様に `LANG1`/`LANG3` 等の短縮エイリアスを使う場合は `LANGUAGE_1`/`LANGUAGE_3` 等の正式名を使うと安全と思われる。
 - ただし `&mkp`（マウスキー）は静的辞書には見当たらないにもかかわらず実際のスクリーンショットでは正常表示されていた。ユーザーが実際に使っている KeymapEditor のインスタンス／バージョンが手元で確認した `main` ブランチのコードと完全に一致しない可能性がある。**この辺りの挙動は推測込みであり、100%の確証はない。**
+
+### 2.5 副産物として発見したバグ: `mac_default_layer`/`ios_default_layer` のタップキーコード欠落
+
+`&lt RIGHT_L LANG2`（現在は `&lt 5 LANGUAGE_2`）の並びで表示を確認していたところ、同じ行の `&lt LEFT_L`（現在は `&lt 4`）に**タップ時のキーコードが1つ欠落**していることが判明（KeymapEditorのQuick Assignモーダルで「Key Code」パラメータが無効表示になっていた）。
+
+- CIのビルド履歴（GitHub Actions）を確認したところ、このバグがあってもビルド自体は成功していた（`west build`のキーマップ生成はセルの欠落に対してエラーにならず、単に意図したキーコードが送出されない状態だった模様）。
+- Windows想定のデフォルトレイヤー（layer 0）では該当位置が `&lt 4 INT_HENKAN`（変換）/ `&lt 5 INT_MUHENKAN`（無変換）。Mac版レイヤーは無変換側を `LANGUAGE_2`（英数）に上書き済みだったので、対称性から変換側も `LANGUAGE_1`（かな）に上書きするのが妥当と判断し追加した。
+- 教訓: KeymapEditorの「未認識」表示（⊘）は、単なるツール側の辞書不足だけでなく、こういう**本当にパラメータが欠落している実バグ**の発見にも役立つ。表示がおかしい箇所は「ツールの限界」と決めつけず、まず実際のソースを見て確認する価値がある。
 
 ### 3. 実機テストの結果: 保存(コミット)は安全だった（`main`ブランチのソース読解による懸念は外れ）
 

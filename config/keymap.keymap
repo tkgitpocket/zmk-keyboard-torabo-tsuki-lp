@@ -189,7 +189,7 @@
 &trans  &trans  &trans  &trans        &trans      &trans                             &trans  &trans  &trans  &trans  &trans  &trans
 &trans  &trans  &trans  &trans        &trans      &trans  &trans             &trans  &trans  &trans  &trans  &trans  &trans  &trans
 &trans  &trans  &trans  &trans        &trans      &trans  &trans             &trans  &trans  &trans  &trans  &trans  &trans  &trans
-&trans  &trans  &trans  &kp LEFT_GUI  &lt 4  &trans  &lt 5 LANG2  &trans  &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &kp LEFT_GUI  &lt 4 LANGUAGE_1  &trans  &lt 5 LANGUAGE_2  &trans  &trans  &trans  &trans  &trans  &trans  &trans
             >;
         };
 
@@ -200,7 +200,7 @@
 &trans  &trans  &trans  &trans        &trans      &trans                             &trans  &trans  &trans  &trans  &trans  &trans
 &trans  &trans  &trans  &trans        &trans      &trans  &trans             &trans  &trans  &trans  &trans  &trans  &trans  &trans
 &trans  &trans  &trans  &trans        &trans      &trans  &trans             &trans  &trans  &trans  &trans  &trans  &trans  &trans
-&trans  &trans  &trans  &kp LEFT_GUI  &lt 4  &trans  &lt 5 LANG2  &trans  &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &kp LEFT_GUI  &lt 4 LANGUAGE_1  &trans  &lt 5 LANGUAGE_2  &trans  &trans  &trans  &trans  &trans  &trans  &trans
             >;
         };
 
