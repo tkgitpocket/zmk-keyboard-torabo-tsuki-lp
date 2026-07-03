@@ -90,20 +90,20 @@ src/
 
 | 番号 | 定数名 | 用途 |
 | ---- | ------ | ---- |
-| 0 | DEFAULT_L | ベース QWERTY |
-| 1 | WINDOWS_L | Windows 用バリアント |
-| 2 | MAC_L | macOS 用バリアント |
-| 3 | IOS_L | iOS 用バリアント |
-| 4 | LEFT_L | 記号（左親指で起動） |
-| 5 | RIGHT_L | 数字・F キー（右親指で起動） |
-| 6 | TRACKBALL_L | マウスボタン |
-| 7 | SLOWTRACKBALL_L | 低速カーソルモード |
-| 8 | SCROLL_L | スクロールモード |
-| 9 | FASTRSCROLL_L | 高速スクロールモード |
-| 10 | CENTER_L | ナビゲーション・クリップボード |
-| 11 | CENTER2_L | ナビゲーション・クリップボード（Mac 用） |
-| 12 | BT_L | Bluetooth プロファイル切り替え |
-| 13 | SLOWSCROLL_L | 低速スクロールモード |
+| 0 | DEFAULT_L | ベース QWERTY（Windows 用としてそのまま使う） |
+| 1 | APPLE_L | macOS・iOS 共用バリアント（キーコードが同一のため統合） |
+| 2 | LEFT_L | 記号（左親指で起動） |
+| 3 | RIGHT_L | 数字・F キー（右親指で起動） |
+| 4 | TRACKBALL_L | マウスボタン |
+| 5 | SLOWTRACKBALL_L | 低速カーソルモード |
+| 6 | SCROLL_L | スクロールモード |
+| 7 | FASTRSCROLL_L | 高速スクロールモード |
+| 8 | CENTER_L | ナビゲーション・クリップボード |
+| 9 | CENTER2_L | ナビゲーション・クリップボード（Mac 用） |
+| 10 | BT_L | Bluetooth プロファイル切り替え |
+| 11 | SLOWSCROLL_L | 低速スクロールモード |
+
+`out_bt_0`/`out_bt_1`（BT プロファイル 0・1）は `&to 0` で DEFAULT_L（Windows）に、`out_bt_2`〜`out_bt_4`（プロファイル 2〜4）は `&to 1` で APPLE_L に切り替える。プロファイルごとに最後に使ったレイヤーではなく常にこのデフォルトレイヤーへ戻る。
 
 `config/keymap.keymap` 内の `&lt`/`&mo`/`&to` の第1引数は、[KeymapEditor](https://nickcoutsos.github.io/keymap-editor/) がCプリプロセッサを実行せず生テキストをそのまま解釈する仕様のため、上記マクロ名ではなく数値リテラルを直接記述している（`layers.dtsi` のマクロは右オーバーレイ側でのみ使用）。
 

@@ -2,17 +2,15 @@
 
 // Layer definitions (shared)
 #define DEFAULT_L        0
-#define WINDOWS_L        1
-#define MAC_L            2
-#define IOS_L            3
-#define LEFT_L           4
-#define RIGHT_L          5
-#define TRACKBALL_L      6
-#define SLOWTRACKBALL_L  7
-#define SCROLL_L         8
-#define FASTRSCROLL_L    9
-#define CENTER_L         10
-#define CENTER2_L        11
-#define BT_L             12
-#define SLOWSCROLL_L     13
+#define APPLE_L          1
+#define LEFT_L           2
+#define RIGHT_L          3
+#define TRACKBALL_L      4
+#define SLOWTRACKBALL_L  5
+#define SCROLL_L         6
+#define FASTRSCROLL_L    7
+#define CENTER_L         8
+#define CENTER2_L        9
+#define BT_L             10
+#define SLOWSCROLL_L     11
 

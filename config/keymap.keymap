@@ -89,41 +89,42 @@
             bindings = <&out OUT_BLE &bt BT_NXT &bt BT_DISC 0 &bt BT_DISC 1 &bt BT_DISC 2 &bt BT_DISC 3 &bt BT_DISC 4>;
         };
 
-        // Select specific BT device (0-4) and disconnect others
+        // Select specific BT device (0-4), disconnect others, and switch to the
+        // default layer matching that device's OS (0-1: Windows, 2-4: Apple)
 
         out_bt_0: out_bt_0 {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
             wait-ms = <50>;
-            bindings = <&out OUT_BLE &bt BT_SEL 0 &bt BT_DISC 1 &bt BT_DISC 2 &bt BT_DISC 3 &bt BT_DISC 4>;
+            bindings = <&out OUT_BLE &bt BT_SEL 0 &bt BT_DISC 1 &bt BT_DISC 2 &bt BT_DISC 3 &bt BT_DISC 4 &to 0>;
         };
 
         out_bt_1: out_bt_1 {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
             wait-ms = <50>;
-            bindings = <&out OUT_BLE &bt BT_SEL 1 &bt BT_DISC 0 &bt BT_DISC 2 &bt BT_DISC 3 &bt BT_DISC 4>;
+            bindings = <&out OUT_BLE &bt BT_SEL 1 &bt BT_DISC 0 &bt BT_DISC 2 &bt BT_DISC 3 &bt BT_DISC 4 &to 0>;
         };
 
         out_bt_2: out_bt_2 {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
             wait-ms = <50>;
-            bindings = <&out OUT_BLE &bt BT_SEL 2 &bt BT_DISC 0 &bt BT_DISC 1 &bt BT_DISC 3 &bt BT_DISC 4>;
+            bindings = <&out OUT_BLE &bt BT_SEL 2 &bt BT_DISC 0 &bt BT_DISC 1 &bt BT_DISC 3 &bt BT_DISC 4 &to 1>;
         };
 
         out_bt_3: out_bt_3 {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
             wait-ms = <50>;
-            bindings = <&out OUT_BLE &bt BT_SEL 3 &bt BT_DISC 0 &bt BT_DISC 1 &bt BT_DISC 2 &bt BT_DISC 4>;
+            bindings = <&out OUT_BLE &bt BT_SEL 3 &bt BT_DISC 0 &bt BT_DISC 1 &bt BT_DISC 2 &bt BT_DISC 4 &to 1>;
         };
 
         out_bt_4: out_bt_4 {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
             wait-ms = <50>;
-            bindings = <&out OUT_BLE &bt BT_SEL 4 &bt BT_DISC 0 &bt BT_DISC 1 &bt BT_DISC 2 &bt BT_DISC 3>;
+            bindings = <&out OUT_BLE &bt BT_SEL 4 &bt BT_DISC 0 &bt BT_DISC 1 &bt BT_DISC 2 &bt BT_DISC 3 &to 1>;
         };
     };
 
@@ -164,43 +165,21 @@
         default {
             bindings = <
 &none           &none      &none         &none         &none                  &none                                                        &none      &none  &none      &none         &none                  &none
-&kp ESCAPE      &kp Q      &kp W         &kp E         &kp R          &kp T                                        &kp Y      &kp U  &kp I      &kp O         &kp P                  &lt 13 BACKSLASH
-&mt LCTRL TAB   &kp A      &kp S         &kp D         &kp F          &kp G          &none          &none          &kp H      &kp J  &kp K      &mt LCTRL L   &lt 8 MINUS            &lt 9 UNDERSCORE
-&kp LEFT_SHIFT  &kp Z      &kp X         &kp C         &kp V          &kp B          &lt 7 B        &kp TILDE      &kp N      &kp M  &mkp LCLK  &mkp RCLK     &mt RIGHT_SHIFT SLASH  &kp RIGHT_SHIFT
-&kp LCTRL       &kp LCTRL  &kp LEFT_WIN  &kp LEFT_ALT  &lt 4 INT_HENKAN  &lt 10 SPACE  &lt 5 INT_MUHENKAN  &kp BACKSPACE  &kp ENTER  &none  &none      &kp QUESTION  &kp QUESTION           &kp RCTRL
+&kp ESCAPE      &kp Q      &kp W         &kp E         &kp R          &kp T                                        &kp Y      &kp U  &kp I      &kp O         &kp P                  &lt 11 BACKSLASH
+&mt LCTRL TAB   &kp A      &kp S         &kp D         &kp F          &kp G          &none          &none          &kp H      &kp J  &kp K      &mt LCTRL L   &lt 6 MINUS            &lt 7 UNDERSCORE
+&kp LEFT_SHIFT  &kp Z      &kp X         &kp C         &kp V          &kp B          &lt 5 B        &kp TILDE      &kp N      &kp M  &mkp LCLK  &mkp RCLK     &mt RIGHT_SHIFT SLASH  &kp RIGHT_SHIFT
+&kp LCTRL       &kp LCTRL  &kp LEFT_WIN  &kp LEFT_ALT  &lt 2 INT_HENKAN  &lt 8 SPACE  &lt 3 INT_MUHENKAN  &kp BACKSPACE  &kp ENTER  &none  &none      &kp QUESTION  &kp QUESTION           &kp RCTRL
             >;
         };
 
-        windows_default_layer {
-            display-name = "Windows Default";
-            bindings = <
-&trans  &trans  &trans  &trans  &trans  &trans                  &trans  &trans  &trans  &trans  &trans  &trans
-&trans  &trans  &trans  &trans  &trans  &trans                  &trans  &trans  &trans  &trans  &trans  &trans
-&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
-&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
-&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans
-            >;
-        };
-
-        mac_default_layer {
-            display-name = "Mac Default";
+        apple_default_layer {
+            display-name = "Apple Default";
             bindings = <
 &trans  &trans  &trans  &trans        &trans      &trans                             &trans  &trans  &trans  &trans  &trans  &trans
 &trans  &trans  &trans  &trans        &trans      &trans                             &trans  &trans  &trans  &trans  &trans  &trans
 &trans  &trans  &trans  &trans        &trans      &trans  &trans             &trans  &trans  &trans  &trans  &trans  &trans  &trans
 &trans  &trans  &trans  &trans        &trans      &trans  &trans             &trans  &trans  &trans  &trans  &trans  &trans  &trans
-&trans  &trans  &trans  &kp LEFT_GUI  &lt 4 LANGUAGE_1  &trans  &lt 5 LANGUAGE_2  &trans  &trans  &trans  &trans  &trans  &trans  &trans
-            >;
-        };
-
-        ios_default_layer {
-            display-name = "iOS Default";
-            bindings = <
-&trans  &trans  &trans  &trans        &trans      &trans                             &trans  &trans  &trans  &trans  &trans  &trans
-&trans  &trans  &trans  &trans        &trans      &trans                             &trans  &trans  &trans  &trans  &trans  &trans
-&trans  &trans  &trans  &trans        &trans      &trans  &trans             &trans  &trans  &trans  &trans  &trans  &trans  &trans
-&trans  &trans  &trans  &trans        &trans      &trans  &trans             &trans  &trans  &trans  &trans  &trans  &trans  &trans
-&trans  &trans  &trans  &kp LEFT_GUI  &lt 4 LANGUAGE_1  &trans  &lt 5 LANGUAGE_2  &trans  &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &kp LEFT_GUI  &lt 2 LANGUAGE_1  &trans  &lt 3 LANGUAGE_2  &trans  &trans  &trans  &trans  &trans  &trans  &trans
             >;
         };
 
@@ -231,7 +210,7 @@
             bindings = <
 &trans  &trans  &trans  &trans  &trans  &trans                  &trans  &trans    &trans     &trans     &trans        &trans
 &trans  &trans  &trans  &trans  &trans  &trans                  &trans  &mkp MB4  &mkp MB3   &mkp MB5   &trans        &trans
-&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans    &mkp LCLK  &mkp RCLK  &mo 8  &mo 9
+&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans    &mkp LCLK  &mkp RCLK  &mo 6  &mo 7
 &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans    &mkp LCLK  &mkp RCLK  &trans        &trans
 &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans    &trans     &trans     &trans        &trans
             >;
@@ -242,7 +221,7 @@
             bindings = <
 &trans  &trans  &trans  &trans  &trans  &trans                  &trans  &trans    &trans     &trans     &trans        &trans
 &trans  &trans  &trans  &trans  &trans  &trans                  &trans  &mkp MB4  &mkp MB3   &mkp MB5   &trans        &trans
-&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans    &mkp LCLK  &mkp RCLK  &mo 8  &mo 9
+&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans    &mkp LCLK  &mkp RCLK  &mo 6  &mo 7
 &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans    &mkp LCLK  &mkp RCLK  &trans        &trans
 &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans    &trans     &trans     &trans        &trans
             >;
@@ -274,7 +253,7 @@
             display-name = "Center SPACE";
             bindings = <
 &trans          &trans     &trans        &trans     &trans           &trans                                  &trans          &trans    &trans     &trans     &trans        &trans
-&trans          &kp TAB    &kp LEFT_ALT  &kp END    &lt 12 SPACE   &kp PRINTSCREEN                         &kp LC(Y)       &mkp MB4  &mkp MB3   &mkp MB5   &kp UP_ARROW  &kp PAGE_UP
+&trans          &kp TAB    &kp LEFT_ALT  &kp END    &lt 10 SPACE   &kp PRINTSCREEN                         &kp LC(Y)       &mkp MB4  &mkp MB3   &mkp MB5   &kp UP_ARROW  &kp PAGE_UP
 &trans          &kp HOME   &kp LC(S)     &kp DEL    &kp RIGHT_ARROW  &kp LEFT_SHIFT   &trans  &trans         &kp BACKSPACE   &none     &none      &mkp LCLK  &mkp RCLK     &kp PAGE_DOWN
 &kp LEFT_SHIFT  &kp LC(Z)  &kp LC(X)     &kp LC(C)  &kp LC(V)        &kp LEFT_ARROW   &trans  &kp PAGE_DOWN  &kp DOWN_ARROW  &trans    &mkp LCLK  &mkp RCLK  &kp ENTER     &trans
 &trans          &trans     &trans        &trans     &trans           &trans           &trans  &kp RCTRL      &trans          &trans    &trans     &trans     &trans        &trans
@@ -285,7 +264,7 @@
             display-name = "Center SPACE(mac)";
             bindings = <
 &trans          &trans     &trans        &trans     &trans           &trans                                  &trans          &trans    &trans     &trans     &trans        &trans
-&trans          &kp TAB    &kp LEFT_ALT  &kp END    &lt 12 SPACE   &kp PRINTSCREEN                         &kp LC(Y)       &mkp MB4  &mkp MB3   &mkp MB5   &kp UP_ARROW  &kp PAGE_UP
+&trans          &kp TAB    &kp LEFT_ALT  &kp END    &lt 10 SPACE   &kp PRINTSCREEN                         &kp LC(Y)       &mkp MB4  &mkp MB3   &mkp MB5   &kp UP_ARROW  &kp PAGE_UP
 &trans          &kp HOME   &kp LC(S)     &kp DEL    &kp RIGHT_ARROW  &kp LEFT_SHIFT   &trans  &trans         &kp BACKSPACE   &none     &none      &mkp LCLK  &mkp RCLK     &kp PAGE_DOWN
 &kp LEFT_SHIFT  &kp LC(Z)  &kp LC(X)     &kp LC(C)  &kp LC(V)        &kp LEFT_ARROW   &trans  &kp PAGE_DOWN  &kp DOWN_ARROW  &trans    &mkp LCLK  &mkp RCLK  &kp ENTER     &trans
 &trans          &trans     &trans        &trans     &trans           &trans           &trans  &kp RCTRL      &trans          &trans    &trans     &trans     &trans        &trans
