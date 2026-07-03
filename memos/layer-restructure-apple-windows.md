@@ -45,12 +45,33 @@
 
 ### zmk-layout-shift(JIS変換)はBTプロファイルと独立
 
-`&tog_ls_on` はセントラル側ファームウェアの単一グローバルフラグで、BTプロファイルに依存しない。ユーザーがプロファイル4でMacに接続した際に記号がUS配列相当になった件は、Mac側のOS設定（キーボードの種類/入力ソースがJIS認識になっていない）が原因である可能性が高いと回答した（ファームウェア側の問題ではない）。
+`&tog_ls_on` はセントラル側ファームウェアの単一グローバルフラグで、BTプロファイルに依存しない。ユーザーがプロファイル4でMacに接続した際に記号がUS配列相当になった件は、Mac側のOS設定（キーボードの種類がJIS認識になっていなかったこと）が原因で、macOS側で「キーボードの種類を変更」からJISを選択したところ解決した（ファームウェア側の問題ではなかった）。
+
+### center2_layer（Mac用センターレイヤー）の有効化とショートカット差し替え
+
+`apple_default_layer` のSPACE位置がまだ `&trans` のままで `center_layer`（Windows用）に委譲されており、`center2_layer` がどこからも呼ばれていなかったため、`apple_default_layer` のSPACE位置を `<lt 9 SPACE>`（CENTER2_L）に変更して有効化した。
+
+あわせて `center2_layer` の内容を、Windows前提のCtrl系ショートカットからMacの標準ショートカットに置き換えた（ユーザーはWindows側でEmacs風にCtrl押下状態を模したナビゲーション配置をしていたため、Mac側もCmd相当に統一）。
+
+| 用途 | center_layer（Windows） | center2_layer（Mac） |
+| --- | --- | --- |
+| 行頭移動 | `HOME` | `LG(LEFT)`（Cmd+←） |
+| 行末移動 | `END` | `LG(RIGHT)`（Cmd+→） |
+| 元に戻す | `LC(Y)`（Ctrl+Y） | `LG(LS(Z))`（Cmd+Shift+Z） |
+| 保存 | `LC(S)`（Ctrl+S） | `LG(S)`（Cmd+S） |
+| 元に戻す(undo) | `LC(Z)`（Ctrl+Z） | `LG(Z)`（Cmd+Z） |
+| 切り取り | `LC(X)`（Ctrl+X） | `LG(X)`（Cmd+X） |
+| コピー | `LC(C)`（Ctrl+C） | `LG(C)`（Cmd+C） |
+| 貼り付け | `LC(V)`（Ctrl+V） | `LG(V)`（Cmd+V） |
+| スクリーンショット | `PRINTSCREEN` | `LS(LG(N5))`（Cmd+Shift+5） |
+
+矢印キー・PageUp/Down・Backspace/Delete・Enter・マウスボタン・`<lt 10 SPACE>`（BT_Lへの入れ子アクセス）はOS差が無いためcenter_layerと同一のまま維持。
 
 ## 未検証・要フォローアップ
 
-- 実機での動作確認は未実施。特にレイヤー番号の振り直しにより `&lt`/`&mo`/`&to` の参照がずれていないか、実機でBTプロファイル切り替え・各レイヤー起動を一通り確認する必要がある。
-- `center_layer`/`center2_layer` の統合は今回見送ったが、後日希望があれば同様の手順で統合可能。
+- 実機での動作確認は一部実施済み（BTプロファイル3→Mac接続、かな/英数、スクロール系レイヤーは問題なし。JIS記号もMac側のキーボード種別設定変更で解決）。
+- `center2_layer` のMac向けショートカット差し替えは今回のセッションで実装したのみで実機未検証。
+- `center_layer`/`center2_layer` の統合は見送り、今回はむしろOS差分の受け皿として活用する方針に転換した。
 
 ## 関連
 

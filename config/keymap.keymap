@@ -179,7 +179,7 @@
 &trans  &trans  &trans  &trans        &trans      &trans                             &trans  &trans  &trans  &trans  &trans  &trans
 &trans  &trans  &trans  &trans        &trans      &trans  &trans             &trans  &trans  &trans  &trans  &trans  &trans  &trans
 &trans  &trans  &trans  &trans        &trans      &trans  &trans             &trans  &trans  &trans  &trans  &trans  &trans  &trans
-&trans  &trans  &trans  &kp LEFT_GUI  &lt 2 LANGUAGE_1  &trans  &lt 3 LANGUAGE_2  &trans  &trans  &trans  &trans  &trans  &trans  &trans
+&trans  &trans  &trans  &kp LEFT_GUI  &lt 2 LANGUAGE_1  &lt 9 SPACE  &lt 3 LANGUAGE_2  &trans  &trans  &trans  &trans  &trans  &trans  &trans
             >;
         };
 
@@ -263,11 +263,11 @@
         center2_layer {
             display-name = "Center SPACE(mac)";
             bindings = <
-&trans          &trans     &trans        &trans     &trans           &trans                                  &trans          &trans    &trans     &trans     &trans        &trans
-&trans          &kp TAB    &kp LEFT_ALT  &kp END    &lt 10 SPACE   &kp PRINTSCREEN                         &kp LC(Y)       &mkp MB4  &mkp MB3   &mkp MB5   &kp UP_ARROW  &kp PAGE_UP
-&trans          &kp HOME   &kp LC(S)     &kp DEL    &kp RIGHT_ARROW  &kp LEFT_SHIFT   &trans  &trans         &kp BACKSPACE   &none     &none      &mkp LCLK  &mkp RCLK     &kp PAGE_DOWN
-&kp LEFT_SHIFT  &kp LC(Z)  &kp LC(X)     &kp LC(C)  &kp LC(V)        &kp LEFT_ARROW   &trans  &kp PAGE_DOWN  &kp DOWN_ARROW  &trans    &mkp LCLK  &mkp RCLK  &kp ENTER     &trans
-&trans          &trans     &trans        &trans     &trans           &trans           &trans  &kp RCTRL      &trans          &trans    &trans     &trans     &trans        &trans
+&trans          &trans        &trans        &trans     &trans           &trans                                  &trans          &trans    &trans     &trans     &trans        &trans
+&trans          &kp TAB       &kp LEFT_ALT  &kp LG(RIGHT)  &lt 10 SPACE   &kp LS(LG(N5))                    &kp LG(LS(Z))   &mkp MB4  &mkp MB3   &mkp MB5   &kp UP_ARROW  &kp PAGE_UP
+&trans          &kp LG(LEFT)  &kp LG(S)     &kp DEL    &kp RIGHT_ARROW  &kp LEFT_SHIFT   &trans  &trans         &kp BACKSPACE   &none     &none      &mkp LCLK  &mkp RCLK     &kp PAGE_DOWN
+&kp LEFT_SHIFT  &kp LG(Z)     &kp LG(X)     &kp LG(C)  &kp LG(V)        &kp LEFT_ARROW   &trans  &kp PAGE_DOWN  &kp DOWN_ARROW  &trans    &mkp LCLK  &mkp RCLK  &kp ENTER     &trans
+&trans          &trans        &trans        &trans     &trans           &trans           &trans  &kp RCTRL      &trans          &trans    &trans     &trans     &trans        &trans
             >;
         };
 
