@@ -131,7 +131,7 @@ src/
 
 | モジュール | 提供元 | 用途 |
 | ---------- | ------ | ---- |
-| zmk | zmkfirmware v0.3 | ZMK 本体 |
+| zmk | cormoran (`v0.3-branch+custom-studio-protocol+ble`) | ZMK 本体。DYA Studio Level 2対応のため公式`zmkfirmware`ではなくcormoran氏のフォークを使用（詳細は下記「DYA Studio対応」節） |
 | zmk-component-bmp-boost | sekigon-gonnoc v0.2 | BMP ボードサポート |
 | zmk-feature-status-led | sekigon-gonnoc | ステータス LED |
 | zmk-driver-paw3222 | sekigon-gonnoc (torabo-tsuki ブランチ) | トラックボールドライバ |
@@ -140,6 +140,21 @@ src/
 | zmk-feature-non-lipo-battery-management | sekigon-gonnoc | 非 LiPo バッテリー ADC 管理 |
 | zmk-scroll-snap | kot149 v1 | スクロール軸ロック機能 |
 | zmk-layout-shift | kot149 v2 | US -> JIS 等のキーコード変換（実行時レイアウトシフト） |
+| zmk-module-ble-management | cormoran（固定コミット、下記参照） | DYA StudioからBLEプロファイルの一覧・名前付け・切替・ペア解除・出力優先度切替を行うRPCモジュール（右のみ有効） |
+
+## DYA Studio対応
+
+[DYA Studio](https://studio.dya.cormoran.works/)（cormoran氏開発のZMK Studio互換Web UI）への対応状況。詳細な調査記録・試行錯誤の経緯は [memos/dya-studio-integration.md](memos/dya-studio-integration.md) を参照。
+
+- **Level 1（キー割り当て・レイヤー名・物理レイアウト切替）**: 対応済み。`CONFIG_ZMK_STUDIO=y`・`CONFIG_ZMK_STUDIO_LOCKING=n`・`studio-rpc-usb-uart`スニペット・`keys`付き物理レイアウト定義は元々揃っており、USB接続で標準ZMK Studio互換のRPCが動作する。
+- **Level 2（BLEプロファイル管理）**: 対応済み。`zmk-module-ble-management`を追加し、`torabo_tsuki_lp_right.conf`に`CONFIG_ZMK_BLE_MANAGEMENT=y`・`CONFIG_ZMK_BLE_MANAGEMENT_STUDIO_RPC=y`を設定。
+- **Level 2（トラックボール/トラックパッド速度調整、per-OSデフォルトレイヤー）**: 見送り。`zmk-module-runtime-input-processor`・`zmk-feature-default-layer`（Studio RPC対応版）はいずれもZMK本家`main`ブランチ（DYA本体が使う`main+dya`相当）の新しいコアAPI（`zmk_keymap_layer_activate`の2引数版、`zmk_endpoint_get_selected`等の単数形関数名）に依存しており、このリポジトリが使うv0.3ベースのZMKフォークとリンクエラーになるため断念した。既存の`out_bt_0`〜`out_bt_4`マクロによるBTプロファイル別デフォルトレイヤー切替をそのまま維持している。
+
+### ZMKフォーク切替の理由
+
+DYA StudioのLevel 2機能（Custom Studio Protocol）を使うには、公式ZMKではなくcormoran氏のフォークが必要。DYA本体が使う`main+dya`ブランチ（独自Zephyrフォーク`v4.1.0+zmk-fixes+nrf-half-duplex-uart`まで要求）ではなく、Zephyrバージョンが公式v0.3と同一（`v3.5.0+zmk-fixes`）で、split/BLE/studio関連への追加的パッチのみの`v0.3-branch+custom-studio-protocol+ble`ブランチを選定し、既存のsekigon-gonnoc/kot149製モジュールへの影響を最小限にした。
+
+**重要な注意点:** cormoran氏の各種DYA Studio対応モジュール（`zmk-module-runtime-input-processor`・`zmk-feature-default-layer`等）は、READMEにv0.3ベースの構成例が書かれていても、実際の`main`ブランチの中身はZMK本家`main`の最新コアAPIを前提に書かれていることが多く、READMEを鵜呑みにするとビルドが通らない。今後モジュールを追加・更新する際は、READMEより先に実際のソースのZMKコアAPI呼び出し（`zmk_keymap_layer_activate`の引数数、`zmk_endpoint_*`系の命名等）とコミット履歴を確認したほうがよい。
 
 ## キーマップ編集
 
