@@ -164,3 +164,28 @@ CIにpushする前にソースレビューで判明したため、実際のビ�
 | マクロ/コンボ編集（Level 2） | 未着手 | 今回のスコープに含めていない |
 
 **分かったこと（今後の参考）:** cormoran氏のDYA Studio関連モジュール群は、READMEに `v0.3-branch+custom-studio-protocol(+ble)` のようなv0.3ベースの構成例が書かれていても、**実際のmainブランチの中身はZMK本家`main`（DYA本体が使う`main+dya`相当）の最新コアAPIを前提に書かれていることが多く、READMEの記載を鵜呑みにできない**。今回はBLE管理のみ「著者が実際にv0.3系フォークで動作確認・修正した形跡があるコミット」を発掘できたため救えたが、これは運が良かったケース。今後同様の対応をする場合、READMEより先にコミット履歴と実際のコア関数呼び出しを確認したほうが手戻りが少ない。
+
+## 実機接続トラブル（2026-08-30）
+
+`dya-studio-level2` ブランチの最新ビルドを両半体に書き込んで接続を試したところ、**USB・BLEどちらでもデバイス選択後にタイムアウト**する症状が発生。
+
+原因調査のため、それまで参照していなかった実際の開発者ガイド本文（`https://studio.dya.cormoran.works/developer-guide/level-1` / `level-2`、SPAのためWebFetchでは中身が取れず、`cormoran/dya-studio` リポジトリの `src/content/developerGuide.ts` を直接取得して内容を確認した）と、公式サンプルリポジトリ [`cormoran/zmk-config-dya-studio-sample`](https://github.com/cormoran/zmk-config-dya-studio-sample) のチュートリアルPR差分を確認した。分かったこと：
+
+1. **`developer-guide/level-2` ページの「スタックとバッファの推奨設定」を追加していなかった。** Custom Studio Protocol対応モジュール（今回は`zmk-module-ble-management`）を使う場合、以下の設定が推奨されている（未設定だとスタック不足でクラッシュ/無応答になり得ると明記）:
+   ```
+   CONFIG_ZMK_SPLIT_RELAY_EVENT=y
+   CONFIG_ZMK_SETTINGS_SAVE_DEBOUNCE=10000
+   CONFIG_ZMK_SPLIT_BLE_CENTRAL_SPLIT_RUN_STACK_SIZE=768
+   CONFIG_ZMK_LOW_PRIORITY_THREAD_STACK_SIZE=4096
+   CONFIG_ZMK_STUDIO_RPC_RX_BUF_SIZE=256
+   CONFIG_ZMK_STUDIO_RPC_TX_BUF_SIZE=256
+   CONFIG_ZMK_STUDIO_RPC_CUSTOM_SUBSYSTEM_REQUEST_PAYLOAD_MAX_BYTES=256
+   CONFIG_ZMK_SPLIT_RELAY_EVENT_DATA_LEN=240
+   CONFIG_SYSTEM_WORKQUEUE_STACK_SIZE=4096
+   CONFIG_ZMK_STUDIO_RPC_THREAD_STACK_SIZE=6000
+   ```
+   （`CONFIG_ZMK_CUSTOM_SETTINGS_LARGE_VALUE_MAX_SIZE=256` はzmk-feature-custom-settings専用のため、それを使っていない本リポジトリでは除外）。USB・BLE両方でタイムアウトしていたことから、Custom Studio Protocolの基盤（カスタムサブシステム列挙等）がバッファ/スタック不足で応答できていない可能性が高いと判断し、`torabo_tsuki_lp_left.conf`・`torabo_tsuki_lp_right.conf` の両方に追加（`CONFIG_ZMK_SPLIT_RELAY_EVENT`関連は分割キーボードのため両側に必要、[zmk-feature-custom-settings](https://github.com/cormoran/zmk-feature-custom-settings)のREADMEにも同様の記載あり）。CIビルドは成功。**実機再検証は次回のフラッシュ後に確認予定。**
+
+2. **Level 2の公式推奨構成は`main+dya`＋専用Zephyrフォーク（`v4.1.0+zmk-fixes+nrf-half-duplex-uart`）であり、今回選んだ`v0.3-branch+custom-studio-protocol+ble`ではない。** 公式サンプルの[Level 2 PR](https://github.com/cormoran/zmk-config-dya-studio-sample/pull/3)もこの構成を使っている。これまで遭遇した一連のコアAPI非互換（`zmk_keymap_layer_activate`の引数、`zmk_endpoint_*`命名等）は、この「非公式ルート」を選んだことに起因する可能性が高い。バッファ/スタック設定の追加で接続できるようになるかを先に確認し、それでも解決しない場合は`main+dya`への切替も選択肢として検討する（ただしZephyr自体の変更を伴うより大きな変更になる）。
+
+3. **`&studio_unlock`はユーザー側で既にキーマップに追加済み**（コミット`697edcd`）だった。`CONFIG_ZMK_STUDIO_LOCKING=n`の場合はZMKのソース上は起動時から常にunlocked状態になるため技術的には無くても動作するはずだが、公式サンプルにも明記されている手順であり実害もないため残置。
