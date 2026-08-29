@@ -25,8 +25,8 @@ manifest:
     - name: zmk-feature-custom-settings
       remote: cormoran
       revision: 5be86dcfb903ecc12624b02cadb40bbdbc78abe3
-    # DYA Studio Level 2: トラックボール/トラックパッド速度をWeb UIから実行時調整
-    - name: zmk-module-runtime-input-processor
+    # DYA Studio Level 2: BLEプロファイルの一覧表示・名前付け・切替・ペア解除をWeb UIから
+    - name: zmk-module-ble-management
       remote: cormoran
       revision: main
     - name: zmk-component-bmp-boost

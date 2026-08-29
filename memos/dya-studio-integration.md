@@ -51,8 +51,8 @@ DYA Studio開発者(cormoran氏)の定義による3段階:
 
 | モジュール | 用途 | ブランチ |
 | --- | --- | --- |
-| `zmk-feature-custom-settings` | 各種カスタム設定の永続化バックエンド（他モジュールの依存先） | `main` |
-| `zmk-module-runtime-input-processor` | トラックボール速度・回転・軸反転等をWeb UIから実行時調整 | `main` |
+| `zmk-feature-custom-settings` | 各種カスタム設定の永続化バックエンド（他モジュールの依存先） | `main`相当（実際はZephyr v3.5.0互換のコミットに固定、後述） |
+| ~~`zmk-module-runtime-input-processor`~~ | ~~トラックボール速度・回転・軸反転等をWeb UIから実行時調整~~ → **断念**（ZMKコアAPI非互換、後述） | - |
 | `zmk-module-ble-management` | BLEプロファイルの一覧表示・名前付け・切替・ペア解除をWeb UIから | `main` |
 | `zmk-feature-default-layer` | per-OS（Windows/macOS/iOS等）デフォルトレイヤーの自動切替。既存の `&to 0`/`&to 1` マクロ方式を置き換え | `codex/custom-rpc-rewrite`（Studio RPC対応版） |
 | `zmk-feature-os-detection` | `zmk-feature-default-layer`のper-OS機能が依存 | `main` |
@@ -104,3 +104,21 @@ DYA Studio開発者(cormoran氏)の定義による3段階:
 **3件目の失敗と対応（より根本的な非互換性）:** さらに再pushしたところ、rightが `fatal_error: Must choose valid location for linker snippet.`（`zmk-feature-custom-settings/CMakeLists.txt:5 (zephyr_linker_sources)`）で失敗。原因を調査したところ、`zmk-feature-custom-settings` は内部で `zephyr_linker_sources(ROM_SECTIONS ...)` を呼んでいるが、**`ROM_SECTIONS` という配置先はこのキーボードが使うZephyr `v3.5.0+zmk-fixes`（公式v0.3系）の `extensions.cmake` には存在しない**（有効なのは `SECTIONS`/`RAM_SECTIONS`/`DATA_SECTIONS`/`ROM_START`/`NOINIT`/`RWDATA`/`RODATA`/`RAMFUNC_SECTION`/`NOCACHE_SECTION`/`PINNED_*` のみ）。`ROM_SECTIONS` はこのモジュールの「Simplification phase 4」というリファクタでのちに追加された比較的新しいZephyr機能に依存しており、Step 1で確認した「ZMKコア自体の追加的パッチ」とは別の、**依存モジュール側がより新しいZephyrを前提にしている**という構造的な非互換性だった。
 
 対応として、`ROM_SECTIONS` 導入前のコミット `5be86dcfb903ecc12624b02cadb40bbdbc78abe3`（`DATA_SECTIONS` のみ使用）に再固定。ソース一式を確認し、他に新しいZephyr専用APIが無いことも確認した。この時点のコードはKconfigの誤字（`configdefault`）も混入前で、`ROM_SECTIONS`より前・`configdefault`バグより前の、両方の問題を回避できる地点。
+
+**4件目の失敗と方針転換: zmk-module-runtime-input-processorを断念**
+
+`zmk-feature-custom-settings` のZephyrバージョン問題を回避した後、今度は `zmk-module-runtime-input-processor` 自体のソース（`src/pointing/input_processor_runtime.c:173`）で `error: too many arguments to function 'zmk_keymap_layer_activate'` が発生。調べたところ、このモジュールは temp-layer機能（ポインティングデバイス操作時に一時的にレイヤーを起動する機能）で `zmk_keymap_layer_activate(layer, false)` と2引数で呼んでいるが、**このキーボードが使うZMKフォーク（`v0.3-branch+custom-studio-protocol+ble`、公式v0.3系）の `zmk_keymap_layer_activate` は1引数しか受け取らない**（`app/include/zmk/keymap.h`で確認）。2引数版はZMK本家の `main` ブランチで後から追加されたシグネチャと考えられる。
+
+この呼び出しはtemp-layer機能を使うか否かに関わらず、`CONFIG_ZMK_RUNTIME_INPUT_PROCESSOR=y` にするとファイル全体がコンパイルされるため、devicetree側の設定では回避不能。
+
+これは「ZMKコア自体の追加パッチ」の問題ではなく、**モジュール本体がZMK本家`main`ブランチ（DYA本体が使う`main+dya`相当）の新しいコアAPIを前提に書かれている**ことによる非互換性で、`zmk-feature-custom-settings`のROM_SECTIONS問題と同種の「依存モジュールが新しいZMK/Zephyrを前提にしている」パターンの2件目。過去コミットを遡って回避する対応も検討したが、この機能が使う `zmk_keymap_layer_activate` の引数追加がいつのモジュールコミットから入ったか特定して古いコミットまで遡る調査は際限がなく、遡っても数ヶ月分の改善・バグ修正を失うことになるため、**費用対効果が見合わないと判断し、このモジュール（トラックボール/トラックパッド速度のWeb UI調整）は今回のLevel 2対応から見送ることにした**。
+
+`config/west.yml` から `zmk-module-runtime-input-processor` を削除し、`torabo_tsuki_lp_right.overlay`・`snippets/input-split-listener/input-split-listener.overlay`・`torabo_tsuki_lp_right.conf` に加えた関連の変更を取り消した。`zmk-feature-custom-settings` はビルドが通ることを確認済みで、後続のper-OSデフォルトレイヤー機能が依存するため west.yml に残している。
+
+### 2026-08-29: Step 3 — BLEプロファイル管理（zmk-module-ble-management）
+
+`config/west.yml` に `zmk-module-ble-management` を追加（`zmk-feature-custom-settings` には依存しない、README記載通り）。`torabo_tsuki_lp_right.conf` に `CONFIG_ZMK_BLE_MANAGEMENT=y`・`CONFIG_ZMK_BLE_MANAGEMENT_STUDIO_RPC=y` を追加。デバイスツリーの変更は不要（BLEプロファイルはZMK標準機構をそのまま使うRPCハンドラのため）。右（central）のみ有効化（ホストとのBLE接続を管理するのは central 側のため）。
+
+このモジュールはREADMEで明示的に `zmk: revision: v0.3-branch+custom-studio-protocol+ble` を要求しており、Step 1で選定したフォークとの組み合わせが著者によって想定されている数少ない実例。カスタム名の永続化もZephyr標準settingsを直接使うとのことで、custom-settingsのZephyrバージョン問題の影響を受けない見込み。
+
+**結果:**（次回更新）

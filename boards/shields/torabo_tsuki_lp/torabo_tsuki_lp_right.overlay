@@ -1,34 +1,13 @@
 #include "torabo_tsuki_lp.dtsi"
 #include <input/processors.dtsi>
-#include <zephyr/dt-bindings/input/input-event-codes.h> // DYA Studio: ランタイム入力プロセッサ(zmk-module-runtime-input-processor)が使うINPUT_EV_REL等
 #include <dt-bindings/zmk/input_transform.h>
 #include <scroll-snap.dtsi> // スクロールスナップ ZMK Scroll Snap Module(https://github.com/kot149/zmk-scroll-snap)を使う
 #include "../../../config/layers.dtsi"
 
-/ {
-    // DYA Studio: トラックボールのXY速度を独立に微調整できるようにする
-    // （既定は1/1=補正なしで既存のスケール値を変えない）。トラックパッド側の
-    // 同種インスタンスは input-split-listener スニペット側で定義している
-    // （&label参照はマージ順序に依存するため、使用箇所と同じファイルで定義する方針）。
-    trackball_speed_rip: trackball_speed_rip {
-        compatible = "zmk,input-processor-runtime";
-        processor-label = "trackball";
-        type = <INPUT_EV_REL>;
-        x-codes = <INPUT_REL_X>;
-        y-codes = <INPUT_REL_Y>;
-        scale-multiplier = <1>;
-        scale-divisor = <1>;
-        rotation-degrees = <0>;
-        track-remainders;
-        #input-processor-cells = <0>;
-    };
-};
-
 &pointing_listener {
     input-processors =
         <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)>,
-        <&zip_xy_scaler 1 2>, // カーソル移動速度を遅くする
-        <&trackball_speed_rip>; // DYA StudioからXY速度を微調整可能にする
+        <&zip_xy_scaler 1 2>; // カーソル移動速度を遅くする
 
     // カーソル遅くする
     slow_cursor {

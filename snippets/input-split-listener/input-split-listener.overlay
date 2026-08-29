@@ -1,5 +1,3 @@
-#include <zephyr/dt-bindings/input/input-event-codes.h> // DYA Studio: ランタイム入力プロセッサ(zmk-module-runtime-input-processor)が使うINPUT_EV_REL等
-
 /{
     split_inputs {
         #address-cells = <1>;
@@ -11,28 +9,12 @@
         };
     };
 
-    // DYA Studio: トラックパッド側のXY速度を独立に微調整できるようにする
-    // （既定は1/1=補正なしで既存のスケール値を変えない）
-    trackpad_speed_rip: trackpad_speed_rip {
-        compatible = "zmk,input-processor-runtime";
-        processor-label = "trackpad";
-        type = <INPUT_EV_REL>;
-        x-codes = <INPUT_REL_X>;
-        y-codes = <INPUT_REL_Y>;
-        scale-multiplier = <1>;
-        scale-divisor = <1>;
-        rotation-degrees = <0>;
-        track-remainders;
-        #input-processor-cells = <0>;
-    };
-
     pointing_device_split_listener: pointing_device_split_listener {
         compatible = "zmk,input-listener";
         device = <&pointing_device_split>;
         status = "okay";
         input-processors =
             <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT | INPUT_TRANSFORM_Y_INVERT)>,
-            <&zip_scroll_transform INPUT_TRANSFORM_Y_INVERT>,
-            <&trackpad_speed_rip>;
+            <&zip_scroll_transform INPUT_TRANSFORM_Y_INVERT>;
      };
 };
