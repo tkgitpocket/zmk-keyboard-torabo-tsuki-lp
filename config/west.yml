@@ -6,10 +6,16 @@ manifest:
       url-base: https://github.com/sekigon-gonnoc
     - name: kot149
       url-base: https://github.com/kot149
+    - name: cormoran
+      url-base: https://github.com/cormoran
   projects:
+    # DYA Studio(Level 2)対応のため、公式ZMK v0.3ではなくcormoran氏のフォーク
+    # （v0.3タグ + Custom Studio Protocol + BLE管理拡張の追加的パッチ）を使用。
+    # Zephyrのバージョンは公式v0.3と同一(v3.5.0+zmk-fixes)で、split/BLE/studio関連の
+    # 追加のみのためドライバ・他社製モジュールへの影響は小さいと判断（詳細はmemos参照）。
     - name: zmk
-      remote: zmkfirmware
-      revision: v0.3
+      remote: cormoran
+      revision: v0.3-branch+custom-studio-protocol+ble
       import: app/west.yml
     - name: zmk-component-bmp-boost
       remote: sekigon-gonnoc
