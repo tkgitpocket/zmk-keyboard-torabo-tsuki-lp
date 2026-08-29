@@ -87,4 +87,14 @@ DYA Studio開発者(cormoran氏)の定義による3段階:
 - スクロール系（SCROLL_L/SLOWSCROLL_L/FASTRSCROLL_L のscroll-snapチェーン）とSLOWTRACKBALL_Lは今回は対象外とし、既存のレイヤー切り替えベースの調整をそのまま残した（変更範囲を絞ってリスクを抑える判断）。
 - `&label { ... }` によるノード参照はビルドシステムのマージ順序に依存する可能性を考慮し、ノード定義と参照は同一ファイル内に収めるようにした（トラックパッド用ノードを`torabo_tsuki_lp_right.overlay`ではなくスニペット自体に置いたのはこのため）。
 
-**結果:**（次回更新）
+**結果: ❌ CIビルド失敗 → 原因特定・回避して再push**
+
+[run](https://github.com/tkgitpocket/zmk-keyboard-torabo-tsuki-lp/actions)がleft/right両方とも失敗。ログを確認したところ、原因は自分の変更ではなく **`zmk-feature-custom-settings` の `main` ブランチHEAD自体のバグ** だった：
+
+```
+/tmp/zmk-config/zmk-feature-custom-settings/Kconfig:16: error: couldn't parse 'configdefault MAIN_STACK_SIZE': syntax error
+```
+
+該当箇所は本来 `config MAIN_STACK_SIZE` / `default 2048` と2行であるべきところが `configdefault MAIN_STACK_SIZE` と1行に結合された誤字（コミット `76fa47e` "Raise MAIN_STACK_SIZE default to 2048"で混入、2026-08-29時点のmain HEADでも未修正）。Kconfigはファイル全体を構文解析してから条件評価するため、`CONFIG_ZMK_CUSTOM_SETTINGS` を有効化していないビルド（左peripheral）even含めて**モジュールがwest workspaceに存在するだけで全ターゲットがビルド不能**になっていた。
+
+**対応:** `config/west.yml` の `zmk-feature-custom-settings` を `main` からこのバグ混入直前のコミット `56ad4260388486e513f07c45a6ab1a404e3e7878` に固定。あわせて、このコミットが未収録の「起動時スタックオーバーフロー対策(MAIN_STACK_SIZEを1024→2048に)」を自前で `torabo_tsuki_lp_right.conf` に `CONFIG_MAIN_STACK_SIZE=2048` として追加。

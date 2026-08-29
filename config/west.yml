@@ -17,10 +17,13 @@ manifest:
       remote: cormoran
       revision: v0.3-branch+custom-studio-protocol+ble
       import: app/west.yml
-    # DYA Studio Level 2: カスタム設定の永続化バックエンド（他モジュールの依存先）
+    # DYA Studio Level 2: カスタム設定の永続化バックエンド（他モジュールの依存先）。
+    # mainブランチHEADのKconfigに構文エラー("configdefault MAIN_STACK_SIZE"という
+    # 誤字、config/defaultが1行に結合されている)がありビルド不能なため、この不具合が
+    # 混入する直前のコミットに固定している（詳細はmemos/dya-studio-integration.md）。
     - name: zmk-feature-custom-settings
       remote: cormoran
-      revision: main
+      revision: 56ad4260388486e513f07c45a6ab1a404e3e7878
     # DYA Studio Level 2: トラックボール/トラックパッド速度をWeb UIから実行時調整
     - name: zmk-module-runtime-input-processor
       remote: cormoran
