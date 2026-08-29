@@ -278,11 +278,11 @@
 
         Bluetooth {
             bindings = <
-&trans  &trans  &trans  &trans  &trans  &trans                              &trans     &trans     &trans     &trans     &trans     &trans
-&trans  &trans  &trans  &trans  &trans  &trans                              &out_bt_0  &out_bt_1  &out_bt_2  &out_bt_3  &out_bt_4  &tog_ls_on
-&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans              &trans     &trans     &trans     &trans     &trans     &trans
-&trans  &trans  &trans  &trans  &trans  &trans  &trans  &kp RC(RA(DELETE))  &trans     &trans     &trans     &trans     &trans     &trans
-&trans  &trans  &trans  &trans  &trans  &trans  &trans  &trans              &trans     &trans     &trans     &trans     &trans     &trans
+&trans  &trans  &trans  &trans  &trans  &trans                                      &trans     &trans     &trans     &trans     &trans     &trans
+&trans  &trans  &trans  &trans  &trans  &trans                                      &out_bt_0  &out_bt_1  &out_bt_2  &out_bt_3  &out_bt_4  &tog_ls_on
+&trans  &trans  &trans  &trans  &trans  &trans  &trans          &trans              &trans     &trans     &trans     &trans     &trans     &trans
+&trans  &trans  &trans  &trans  &trans  &trans  &studio_unlock  &kp RC(RA(DELETE))  &trans     &trans     &trans     &trans     &trans     &trans
+&trans  &trans  &trans  &trans  &trans  &trans  &trans          &trans              &trans     &trans     &trans     &trans     &trans     &trans
             >;
         };
 
