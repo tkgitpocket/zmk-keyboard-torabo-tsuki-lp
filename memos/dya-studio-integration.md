@@ -186,6 +186,17 @@ CIにpushする前にソースレビューで判明したため、実際のビ�
    ```
    （`CONFIG_ZMK_CUSTOM_SETTINGS_LARGE_VALUE_MAX_SIZE=256` はzmk-feature-custom-settings専用のため、それを使っていない本リポジトリでは除外）。USB・BLE両方でタイムアウトしていたことから、Custom Studio Protocolの基盤（カスタムサブシステム列挙等）がバッファ/スタック不足で応答できていない可能性が高いと判断し、`torabo_tsuki_lp_left.conf`・`torabo_tsuki_lp_right.conf` の両方に追加（`CONFIG_ZMK_SPLIT_RELAY_EVENT`関連は分割キーボードのため両側に必要、[zmk-feature-custom-settings](https://github.com/cormoran/zmk-feature-custom-settings)のREADMEにも同様の記載あり）。CIビルドは成功。**実機再検証は次回のフラッシュ後に確認予定。**
 
-2. **Level 2の公式推奨構成は`main+dya`＋専用Zephyrフォーク（`v4.1.0+zmk-fixes+nrf-half-duplex-uart`）であり、今回選んだ`v0.3-branch+custom-studio-protocol+ble`ではない。** 公式サンプルの[Level 2 PR](https://github.com/cormoran/zmk-config-dya-studio-sample/pull/3)もこの構成を使っている。これまで遭遇した一連のコアAPI非互換（`zmk_keymap_layer_activate`の引数、`zmk_endpoint_*`命名等）は、この「非公式ルート」を選んだことに起因する可能性が高い。バッファ/スタック設定の追加で接続できるようになるかを先に確認し、それでも解決しない場合は`main+dya`への切替も選択肢として検討する（ただしZephyr自体の変更を伴うより大きな変更になる）。
+2. **Level 2の公式推奨構成は`main+dya`＋専用Zephyrフォーク（`v4.1.0+zmk-fixes+nrf-half-duplex-uart`）であり、今回選んだ`v0.3-branch+custom-studio-protocol+ble`ではない。** 公式サンプルの[Level 2 PR](https://github.com/cormoran/zmk-config-dya-studio-sample/pull/3)もこの構成を使っている。これまで遭遇した一連のコアAPI非互換（`zmk_keymap_layer_activate`の引数、`zmk_endpoint_*`命名等）は、この「非公式ルート」を選んだことに起因する可能性が高い。
+
+再pushしたバッファ/スタック設定を書き込んだところ、**（何度か試した末に）DYA Studioへの接続自体は成功**した。Keymapタブは表示・編集できる。
+
+ただし新たな問題が2つ判明:
+
+- トラックボールタブで「このキーボードではランタイム入力プロセッサーサブシステムを利用できません。ファームウェアでcormoran/zmk-module-runtime-input-processorが有効になっていることを確認してください」と表示される。これは**想定通り**（Step 3で意図的に見送った機能のため）。
+- **実機が不安定になる**（マウスカーソルの動きが遅くなる、キーが全く反応しなくなる）症状が発生。トラブルシューティングページの「キーボードがリセットされたり、フリーズ後に復帰したりする: stack overflowまたは時間のかかる処理によってWatchdog timerが動作した可能性が高い」に該当する可能性が高い。
+
+追加したバッファ/スタック設定のうち、`CONFIG_ZMK_SPLIT_BLE_CENTRAL_SPLIT_RUN_STACK_SIZE`（デフォルト512→768、増加のみ）や各種RPCバッファ（デフォルトより増加のみ）は、値を縮めてしまっている箇所ではないことを確認済み。一方 `CONFIG_ZMK_SPLIT_RELAY_EVENT=y` は、`zmk-module-ble-management`のソース（`ble_management_handler.c`）を確認したところ**一切使用していない**ことが判明した。この設定は分割キーボードの左右間に新しいBLE GATTキャラクタリスティック（`relay_event_subscribe_params`）の購読を追加し、split接続の「完全にsubscribeできた」判定条件にも組み込まれる（`app/src/split/bluetooth/central.c`の`split_central_chrc_discovery_func`参照）。「custom-studio-protocol+ble」という比較的検証の薄い拡張コードパスに、不要な購読処理を追加してしまっていたことになる。**不要かつ疑わしいため`CONFIG_ZMK_SPLIT_RELAY_EVENT`・`CONFIG_ZMK_SPLIT_RELAY_EVENT_DATA_LEN`を削除**し、実機での再検証待ち。
+
+もしこれでも改善しない場合は`main+dya`への切替も選択肢として検討する（ただしZephyr自体の変更を伴うより大きな変更になる）。
 
 3. **`&studio_unlock`はユーザー側で既にキーマップに追加済み**（コミット`697edcd`）だった。`CONFIG_ZMK_STUDIO_LOCKING=n`の場合はZMKのソース上は起動時から常にunlocked状態になるため技術的には無くても動作するはずだが、公式サンプルにも明記されている手順であり実害もないため残置。
