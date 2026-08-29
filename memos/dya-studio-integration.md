@@ -98,3 +98,5 @@ DYA Studio開発者(cormoran氏)の定義による3段階:
 該当箇所は本来 `config MAIN_STACK_SIZE` / `default 2048` と2行であるべきところが `configdefault MAIN_STACK_SIZE` と1行に結合された誤字（コミット `76fa47e` "Raise MAIN_STACK_SIZE default to 2048"で混入、2026-08-29時点のmain HEADでも未修正）。Kconfigはファイル全体を構文解析してから条件評価するため、`CONFIG_ZMK_CUSTOM_SETTINGS` を有効化していないビルド（左peripheral）even含めて**モジュールがwest workspaceに存在するだけで全ターゲットがビルド不能**になっていた。
 
 **対応:** `config/west.yml` の `zmk-feature-custom-settings` を `main` からこのバグ混入直前のコミット `56ad4260388486e513f07c45a6ab1a404e3e7878` に固定。あわせて、このコミットが未収録の「起動時スタックオーバーフロー対策(MAIN_STACK_SIZEを1024→2048に)」を自前で `torabo_tsuki_lp_right.conf` に `CONFIG_MAIN_STACK_SIZE=2048` として追加。
+
+**2件目の失敗と対応:** 修正後の再pushではleftは成功したが、rightが `fatal error: dt-bindings/zmk/input.h: No such file or directory` で失敗。zmk-module-runtime-input-processorのREADME記載の `#include <dt-bindings/zmk/input.h>` は誤りで、実際にモジュール自身のテストconfig（`tests/zmk-config/boards/shields/my_awesome_keyboard/my_awesome_keyboard.overlay`）を確認したところ正しいincludeは `<zephyr/dt-bindings/input/input-event-codes.h>` だった。`torabo_tsuki_lp_right.overlay`・`input-split-listener.overlay` 両方のincludeを修正。

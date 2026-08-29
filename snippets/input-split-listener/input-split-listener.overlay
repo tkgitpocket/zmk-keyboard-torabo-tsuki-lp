@@ -1,4 +1,4 @@
-#include <dt-bindings/zmk/input.h> // DYA Studio: ランタイム入力プロセッサ(zmk-module-runtime-input-processor)が使うINPUT_EV_REL等
+#include <zephyr/dt-bindings/input/input-event-codes.h> // DYA Studio: ランタイム入力プロセッサ(zmk-module-runtime-input-processor)が使うINPUT_EV_REL等
 
 /{
     split_inputs {
