@@ -121,6 +121,12 @@ src/
 タイムアウトは 5秒 / 15秒 / 30秒。USB 給電中はアクティブモードを維持する。
 `CONFIG_ZMK_SPLIT_ROLE_CENTRAL` が有効な場合のみコンパイルされる。
 
+これとは別に、ZMK 本体が管理する PC ↔ セントラル間のディープスリープ移行時間 `CONFIG_ZMK_IDLE_SLEEP_TIMEOUT` を左右 `.conf` で **43,200,000ms（12時間）** に延長している（ZMK デフォルトは 15分）。一晩（7〜8時間）放置後にディープスリープから復帰する際、左（ペリフェラル）だけ右より約10秒遅れて反応する問題があり、その対策として設定した（詳細: [memos/ble-sleep-reconnect-investigation.md](memos/ble-sleep-reconnect-investigation.md)）。
+
+### バッテリー残量表示（非 LiPo 電池）
+
+単3形エネループ（NiMH、片側1本ずつ）を `zmk-feature-non-lipo-battery-management`（sekigon-gonnoc）経由で監視している。電圧→% の線形変換に使う `CONFIG_ZMK_NON_LIPO_MAX_MV` を左右 `.conf` で **1400**（ドライバのデフォルトは1300）に設定済み。デフォルト値のままだとエネループの実用電圧域（1.2〜1.3V）が上限に貼り付いて常に100%表示になる問題があったための調整（詳細: [memos/battery-level-100-percent-investigation.md](memos/battery-level-100-percent-investigation.md)）。
+
 ### 外部モジュール（`config/west.yml`）
 
 | モジュール | 提供元 | 用途 |
