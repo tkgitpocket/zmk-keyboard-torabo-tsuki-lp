@@ -25,10 +25,14 @@ manifest:
     - name: zmk-feature-custom-settings
       remote: cormoran
       revision: 5be86dcfb903ecc12624b02cadb40bbdbc78abe3
-    # DYA Studio Level 2: BLEプロファイルの一覧表示・名前付け・切替・ペア解除をWeb UIから
+    # DYA Studio Level 2: BLEプロファイルの一覧表示・名前付け・切替・ペア解除をWeb UIから。
+    # mainブランチHEADは zmk_endpoint_get/set_preferred_transport（単数形）を呼ぶが、
+    # このキーボードが使うZMKフォークには zmk_endpoints_get_preferred_transport等
+    # （複数形）しか無くリンクエラーになる。複数形呼び出しに直した最後のコミットに固定
+    # （詳細はmemos/dya-studio-integration.md）。
     - name: zmk-module-ble-management
       remote: cormoran
-      revision: main
+      revision: 2147ba7d329253ef9d0cfe4c6b814add7915225c
     - name: zmk-component-bmp-boost
       remote: sekigon-gonnoc
       import: west.yml

@@ -121,4 +121,15 @@ DYA Studio開発者(cormoran氏)の定義による3段階:
 
 このモジュールはREADMEで明示的に `zmk: revision: v0.3-branch+custom-studio-protocol+ble` を要求しており、Step 1で選定したフォークとの組み合わせが著者によって想定されている数少ない実例。カスタム名の永続化もZephyr標準settingsを直接使うとのことで、custom-settingsのZephyrバージョン問題の影響を受けない見込み。
 
-**結果:**（次回更新）
+**結果: ❌ CIビルド失敗 → 原因特定・回避**
+
+```
+/tmp/zmk-config/zmk-module-ble-management/src/studio/ble_management_handler.c:543: undefined reference to `zmk_endpoint_set_preferred_transport'
+/tmp/zmk-config/zmk-module-ble-management/src/studio/ble_management_handler.c:564: undefined reference to `zmk_endpoint_get_preferred_transport'
+```
+
+`main` ブランチHEADの出力プライオリティ切替（Output Priority Toggle）機能が `zmk_endpoint_get/set_preferred_transport`（単数形 "endpoint"）というZMKコア関数を呼んでいるが、このキーボードが使うZMKフォーク（`v0.3-branch+custom-studio-protocol+ble`）には `zmk_endpoints_get_preferred_transport`・`zmk_endpoints_select_transport`（複数形 "endpoints"）しか存在しない。
+
+コミット履歴を調査したところ、[コミット `659d389`](https://github.com/cormoran/zmk-module-ble-management/commit/659d389f1212fdb4647b432161127e4e436665e9)（2026-02-04、コミットメッセージ "Use zmk_endpoints_get_preferred_transport"）でまさにこの複数形の呼び出しに修正されており、**同じコミットのREADME差分でzmk依存を`v0.3+custom-studio-protocol`から今回選定した`v0.3-branch+custom-studio-protocol+ble`に更新している**——つまり著者自身がこの時点でこのフォークとの組み合わせを検証・修正した形跡そのものだった。しかしその後（2026-04-30以降のどこか）でZMK本家`main`側の関数名が単数形にリネームされたのに追従し、`main`ブランチは単数形呼び出しに戻ってしまっている（README記載の推奨revisionが更新されないまま取り残されている状態）。
+
+対応として、複数形呼び出しのまま残っている最後のコミット `2147ba7d329253ef9d0cfe4c6b814add7915225c`（2026-02-06、次のコミットまで4ヶ月弱の空白期間があり、その間の変更が無いことを確認済み）に固定。
