@@ -17,6 +17,14 @@ manifest:
       remote: cormoran
       revision: v0.3-branch+custom-studio-protocol+ble
       import: app/west.yml
+    # DYA Studio Level 2: カスタム設定の永続化バックエンド（他モジュールの依存先）
+    - name: zmk-feature-custom-settings
+      remote: cormoran
+      revision: main
+    # DYA Studio Level 2: トラックボール/トラックパッド速度をWeb UIから実行時調整
+    - name: zmk-module-runtime-input-processor
+      remote: cormoran
+      revision: main
     - name: zmk-component-bmp-boost
       remote: sekigon-gonnoc
       import: west.yml

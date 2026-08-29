@@ -70,4 +70,21 @@ DYA Studio開発者(cormoran氏)の定義による3段階:
 
 ### 2026-08-29: Step 1 — ZMKフォーク切り替え
 
-`config/west.yml` の `zmk` を `cormoran/zmk` の `v0.3-branch+custom-studio-protocol+ble` に変更してpush。（結果は次回更新）
+`config/west.yml` の `zmk` を `cormoran/zmk` の `v0.3-branch+custom-studio-protocol+ble` に変更してpush。
+
+**結果: ✅ CIビルド成功**（[run #41](https://github.com/tkgitpocket/zmk-keyboard-torabo-tsuki-lp/actions)）。既存のPAW3222トラックボール・IQS7211Eトラックパッド・BMP Boost・zmk-scroll-snap・zmk-layout-shift等、他社製モジュールを含めて問題なくビルドが通ることを確認。事前のdiff調査（追加的パッチのみ、Zephyrバージョン同一）通りの結果。
+
+### 2026-08-29: Step 2 — トラックボール/トラックパッド速度調整（zmk-module-runtime-input-processor）
+
+`config/west.yml` に `zmk-feature-custom-settings`・`zmk-module-runtime-input-processor` を追加。`torabo_tsuki_lp_right.conf` に `CONFIG_ZMK_POINTING=y`・`CONFIG_ZMK_RUNTIME_INPUT_PROCESSOR=y`・`CONFIG_ZMK_RUNTIME_INPUT_PROCESSOR_STUDIO_RPC=y`・`CONFIG_ZMK_LOW_PRIORITY_THREAD_STACK_SIZE=2048` を追加。
+
+**設計判断:**
+
+- モジュール付属の既定ノード（`mouse_runtime_input_processor`）はトラックボール・トラックパッドどちらの構成でも単一の共有インスタンスになってしまい、片方を調整すると両方の速度が一緒に動いてしまう。これを避けるため、`processor-label`を分けた**独自インスタンスを2つ**定義した：
+  - `trackball_speed_rip`（`torabo_tsuki_lp_right.overlay` で定義） — 右トラックボール(`&pointing_listener`)の通常速度チェーン末尾に追加。
+  - `trackpad_speed_rip`（`snippets/input-split-listener/input-split-listener.overlay` で定義） — 左トラックパッド(ミニ)のイベントが中継される`&pointing_device_split_listener`のチェーン末尾に追加。
+- どちらも既定値 `scale-multiplier=1 / scale-divisor=1`（補正なし）としたため、**既存の速度設定（トラックボール1/2、SLOWTRACKBALL_L 1/6等）は一切変更していない**。DYA StudioのWeb UIから追加の倍率をかけられる「トリム」として追加しただけ。
+- スクロール系（SCROLL_L/SLOWSCROLL_L/FASTRSCROLL_L のscroll-snapチェーン）とSLOWTRACKBALL_Lは今回は対象外とし、既存のレイヤー切り替えベースの調整をそのまま残した（変更範囲を絞ってリスクを抑える判断）。
+- `&label { ... }` によるノード参照はビルドシステムのマージ順序に依存する可能性を考慮し、ノード定義と参照は同一ファイル内に収めるようにした（トラックパッド用ノードを`torabo_tsuki_lp_right.overlay`ではなくスニペット自体に置いたのはこのため）。
+
+**結果:**（次回更新）
