@@ -133,3 +133,34 @@ DYA Studio開発者(cormoran氏)の定義による3段階:
 コミット履歴を調査したところ、[コミット `659d389`](https://github.com/cormoran/zmk-module-ble-management/commit/659d389f1212fdb4647b432161127e4e436665e9)（2026-02-04、コミットメッセージ "Use zmk_endpoints_get_preferred_transport"）でまさにこの複数形の呼び出しに修正されており、**同じコミットのREADME差分でzmk依存を`v0.3+custom-studio-protocol`から今回選定した`v0.3-branch+custom-studio-protocol+ble`に更新している**——つまり著者自身がこの時点でこのフォークとの組み合わせを検証・修正した形跡そのものだった。しかしその後（2026-04-30以降のどこか）でZMK本家`main`側の関数名が単数形にリネームされたのに追従し、`main`ブランチは単数形呼び出しに戻ってしまっている（README記載の推奨revisionが更新されないまま取り残されている状態）。
 
 対応として、複数形呼び出しのまま残っている最後のコミット `2147ba7d329253ef9d0cfe4c6b814add7915225c`（2026-02-06、次のコミットまで4ヶ月弱の空白期間があり、その間の変更が無いことを確認済み）に固定。
+
+再pushの結果 **✅ CIビルド成功**。BLEプロファイル管理（一覧・名前付け・切替・ペア解除・出力プライオリティ切替）がDYA Studio Level 2機能として動作する状態になった（実機での動作確認は未実施）。
+
+### 2026-08-29: Step 4 — per-OSデフォルトレイヤー（zmk-feature-default-layer）を調査した上で断念
+
+`zmk-feature-default-layer` の `codex/custom-rpc-rewrite`（Studio RPC対応版）ブランチのソースを事前に確認したところ、`src/default_layer.c` が
+
+- `zmk_keymap_layer_activate(layer_id, true)` / `zmk_keymap_layer_deactivate(layer_id, true)` — **2引数**呼び出し（このキーボードのZMKフォークは1引数版のみ、Step 3で断念したruntime-input-processorと全く同じ非互換パターン）
+- `zmk_endpoint_get_selected()` — **単数形**の関数名（このキーボードのZMKフォークには存在せず、`zmk_endpoints_selected()`という別名の複数形版のみ存在。BLE管理のケースと同じ非互換パターン）
+
+を使っていることが判明した。`zmk-module-ble-management` のケースでは「複数形呼び出しに直したコミット」まで遡ることで回避できたが、今回は**このブランチが分岐した最初のコミット（`566373a`, 2026-07-04）の時点で既にこれらの呼び出しが存在**しており、ブランチ内に互換性のある地点が無い。これ以上遡るには `codex/custom-rpc-rewrite` ブランチの分岐元まで遡る必要があり、その場合Studio RPC対応（Web UIからの編集機能）自体が失われる可能性が高く、実質的に得るものが無くなる。
+
+CIにpushする前にソースレビューで判明したため、実際のビルド失敗は発生させていない。**per-OSデフォルトレイヤーのDYA Studio対応は今回見送り**、既存の `out_bt_0`〜`out_bt_4` マクロ（`&to 0`/`&to 1`によるBTプロファイル別デフォルトレイヤー切替、[layer-restructure-apple-windows.md](layer-restructure-apple-windows.md)参照）をそのまま維持する。
+
+`zmk-feature-os-detection`（per-OS機能の依存先）は最初から追加していなかったため変更なし。
+
+### 後片付け
+
+`zmk-feature-custom-settings` は、依存していた `zmk-module-runtime-input-processor`（Step 3で断念）・`zmk-feature-default-layer`（Step 4で断念）の両方を見送ったことで**唯一の利用者がいなくなった**（`zmk-module-ble-management` はZephyr標準settingsを直接使うため不要）ため、`config/west.yml` から削除した。あわせて、custom-settings/runtime-input-processor向けに追加していた `CONFIG_ZMK_LOW_PRIORITY_THREAD_STACK_SIZE`・`CONFIG_MAIN_STACK_SIZE` も、必要とするモジュールが無くなったため `torabo_tsuki_lp_right.conf` から削除した。
+
+## 最終結果まとめ（`dya-studio-level2` ブランチ）
+
+| 機能 | 状態 | 備考 |
+| --- | --- | --- |
+| Level 1（キー割り当て・レイヤー名・物理レイアウト切替） | ✅ 対応済み | 実は対応作業前から既に満たされていた |
+| BLEプロファイル管理（Level 2） | ✅ 対応 | `zmk-module-ble-management`、CIビルド成功。実機未検証 |
+| トラックボール/トラックパッド速度調整（Level 2） | ❌ 見送り | `zmk-module-runtime-input-processor` がZMK本家mainの新しいコアAPI(`zmk_keymap_layer_activate`の2引数版)に依存しており非互換 |
+| per-OSデフォルトレイヤー（Level 2） | ❌ 見送り | `zmk-feature-default-layer`(RPC版)が同様に新しいコアAPIに依存。既存のBTプロファイル別切替マクロを維持 |
+| マクロ/コンボ編集（Level 2） | 未着手 | 今回のスコープに含めていない |
+
+**分かったこと（今後の参考）:** cormoran氏のDYA Studio関連モジュール群は、READMEに `v0.3-branch+custom-studio-protocol(+ble)` のようなv0.3ベースの構成例が書かれていても、**実際のmainブランチの中身はZMK本家`main`（DYA本体が使う`main+dya`相当）の最新コアAPIを前提に書かれていることが多く、READMEの記載を鵜呑みにできない**。今回はBLE管理のみ「著者が実際にv0.3系フォークで動作確認・修正した形跡があるコミット」を発掘できたため救えたが、これは運が良かったケース。今後同様の対応をする場合、READMEより先にコミット履歴と実際のコア関数呼び出しを確認したほうが手戻りが少ない。

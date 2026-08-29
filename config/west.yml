@@ -17,14 +17,6 @@ manifest:
       remote: cormoran
       revision: v0.3-branch+custom-studio-protocol+ble
       import: app/west.yml
-    # DYA Studio Level 2: カスタム設定の永続化バックエンド（他モジュールの依存先）。
-    # mainブランチHEAD相当のコードは zephyr_linker_sources(ROM_SECTIONS ...) を使うが、
-    # このキーボードが使うZephyr v3.5.0+zmk-fixes（v0.3系）には ROM_SECTIONS という
-    # linker snippet位置が存在せず（DATA_SECTIONS/RODATA等のみ）ビルド不能。
-    # この機能が導入される前のコミットに固定している（詳細はmemos/dya-studio-integration.md）。
-    - name: zmk-feature-custom-settings
-      remote: cormoran
-      revision: 5be86dcfb903ecc12624b02cadb40bbdbc78abe3
     # DYA Studio Level 2: BLEプロファイルの一覧表示・名前付け・切替・ペア解除をWeb UIから。
     # mainブランチHEADは zmk_endpoint_get/set_preferred_transport（単数形）を呼ぶが、
     # このキーボードが使うZMKフォークには zmk_endpoints_get_preferred_transport等
