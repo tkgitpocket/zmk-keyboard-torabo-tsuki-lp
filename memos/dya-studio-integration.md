@@ -237,4 +237,12 @@ CIにpushする前にソースレビューで判明したため、実際のビ�
 - `snippets/input-split-listener/input-split-listener.overlay`: トラックパッド用`trackpad_speed_rip`ノードを同様に復活。
 - `CONFIG_ZMK_IDLE_SLEEP_TIMEOUT`（12時間、独自カスタマイズ）は変更していない。ただし`zmk-module-settings-rpc`はDYA Studio経由でアイドル/スリープタイムアウトを実行時変更できる機能を提供する（`zmk_activity_set_idle_ms`/`set_sleep_ms`）ため、Web UI側でうっかり変更されないよう留意（設定を変えた場合は本家配線と同様に手元の`.conf`のデフォルトへ差分が出る点は許容）。
 
-**結果:**（次回のpush・実機検証待ち）
+**結果: ビルド試行錯誤の末 ✅ CIビルド成功。**
+
+1回目の失敗: `torabo_tsuki_lp_left.conf`/`_right.conf`の`CONFIG_ZMK_BATTERY_SKIP_IF_USB_POWERED=n`が未定義シンボルへの代入としてKconfigエラー（`zmk-module-battery-history`を導入していないため存在しないシンボル）。削除して対応。
+
+2回目の失敗: leftは成功したがrightが `error: static assertion failed: "processor_label trackball property +1 exceeds maximum length 8"`。`zmk-module-runtime-input-processor`の`CONFIG_ZMK_RUNTIME_INPUT_PROCESSOR_NAME_MAX_LEN`（既定8文字、終端文字込みで実質7文字までが目安）を、独自定義した`trackball_speed_rip`/`trackpad_speed_rip`ノードの`processor-label = "trackball"`（9文字）/`"trackpad"`（8文字）が超過していた。`"tball"`/`"tpad"`に短縮して解消。
+
+なお`CONFIG_ZMK_SPLIT_BLE_CENTRAL_SPLIT_RUN_STACK_SIZE`・`CONFIG_ZMK_POINTING_SMOOTH_SCROLLING`のような「centralロール専用設定をperipheral側の.confにも書いてしまっている」役割不一致のKconfig警告は、本家リポジトリも同じパターンで実際にビルドが通っていることから**非致命的（ビルドを止めない）**と判明。「Kconfig警告=即ビルド失敗」ではなく、未定義シンボルへの代入など一部の警告のみが実際にfatalになる模様。
+
+**実機での動作確認（接続・安定性とも）は次回のフラッシュ後にユーザーに確認してもらう。**
