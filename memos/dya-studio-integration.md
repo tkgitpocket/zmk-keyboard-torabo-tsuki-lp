@@ -210,3 +210,31 @@ CIにpushする前にソースレビューで判明したため、実際のビ�
 **次の切り分けとして、バッファ/スタック拡張設定を全て削除し、`zmk-module-ble-management`の最小構成（`CONFIG_ZMK_BLE_MANAGEMENT`・`CONFIG_ZMK_BLE_MANAGEMENT_STUDIO_RPC`のみ）に戻したビルドを用意した。** 今回はDYA Studioへの接続可否は一旦度外視し、**普段使用時の安定性のみ**を確認してもらう。これで不安定症状が消えれば拡張設定（スタックサイズ増加によるRAM圧迫等）が原因、消えなければ`zmk-module-ble-management`自体かZMKフォーク本体（`v0.3-branch+custom-studio-protocol+ble`）が原因という切り分けになる。後者の場合、Step 1（フォーク切替のみ、ble-managementなし）まで遡っての検証が次の一手になる。
 
 3. **`&studio_unlock`はユーザー側で既にキーマップに追加済み**（コミット`697edcd`）だった。`CONFIG_ZMK_STUDIO_LOCKING=n`の場合はZMKのソース上は起動時から常にunlocked状態になるため技術的には無くても動作するはずだが、公式サンプルにも明記されている手順であり実害もないため残置。
+
+## 方針転換: torabo-tsuki-lp本家のDYA Studio対応ブランチを参考実装として採用（2026-08-30）
+
+普段使用時の不安定症状について再確認したところ、実は「接続直後の一時的な不安定さ」を「常時不安定」と誤認していたことが判明（再検証で安定動作を確認）。ただしその後、より詳細な検証で **やはり両バージョンとも常用に耐えないレベルの不安定さ（トラックボール反応低下、左側の認識不良）がある** ことが再度報告された。DYA Studio非対応版（`master`）は安定して動作している。
+
+この過程でユーザーから重要な情報提供があった: **torabo-tsuki-lpの本家リポジトリ（sekigon-gonnoc氏、このキーボードのハードウェア設計者）に、非公式ながら実際にDYA Studio対応済みのブランチが存在する**:
+
+- <https://github.com/sekigon-gonnoc/zmk-keyboard-torabo-tsuki-lp/tree/v0.3+dya-studio>
+- 参考: cormoran氏自身のキーボード <https://github.com/cormoran/zmk-keyboard-dya-dash>, <https://github.com/cormoran/zmk-keyboard-dya2>（マイコンは異なる）
+
+本家の実装を調査した結果、重要な差分が判明した:
+
+- **ZMKフォークは`v0.3-branch+custom-studio-protocol+ble`ではなく`v0.3-branch+dya`。** 自己判断で選んだ前者は「custom-studio-protocol」機能に絞った狭い拡張だったが、本家が使う`v0.3-branch+dya`は`main+dya`（DYA本体が使う本流ブランチ）の**v0.3版フルバックポート**で、より完全にDYA Studio機能をサポートしている。Zephyrバージョンは`v3.5.0+zmk-fixes`のままで公式v0.3と同一（`main+dya`が要求する独自Zephyrフォーク`v4.1.0+...`は不要）と確認済み。
+- **`src/board.c`（独自のBLE分割電源管理）は本家のDYA Studio対応ブランチでも完全に無変更のまま存在**（diffで確認、内容が一致）。つまりboard.cはDYA Studio対応と衝突しない。
+- **Studio RPC関連のKconfigは、両半体共通の`.conf`ではなく`snippets/split-central/split-central.conf`（centralロール専用スニペット）に集約**するのが本家の設計パターン。`CONFIG_ZMK_RUNTIME_INPUT_PROCESSOR`・`CONFIG_ZMK_SETTINGS_RPC_STUDIO`・`CONFIG_ZMK_BLE_MANAGEMENT_STUDIO_RPC`・`CONFIG_ZMK_RUNTIME_INPUT_PROCESSOR_STUDIO_RPC`はここに置く。
+- **`CONFIG_ZMK_SPLIT_RELAY_EVENT`は実際には`zmk-module-settings-rpc`が`default y`で要求する設定だった**（Step 3〜4で「ble-managementが使わないから不要」と判断して削除したのは、settings-rpcを導入していなかった当時の情報に基づく誤った判断）。settings-rpc導入に伴い復活させる。
+- **本家は`zmk-module-runtime-input-processor`（トラックボール速度調整）を実際に使えている。** ただし本家のwest.ymlは`revision: main`と書かれているが、これは2026-02-24時点のCIが最後に成功した時のHEADを指しているだけで、**現在のmain HEADは以前調査した通りZMK本家mainの新しいコアAPI(`zmk_keymap_layer_activate`の2引数版)に依存しており、`v0.3-branch+dya`（今も1引数のまま）とはリンクエラーになる**ことを実際に確認した。モジュールのコミット履歴を調査し、この非互換が入る直前のコミット（2026-02-24、`dbf92f764de8b6ffd60bf5850514302875fe2570`、ちょうど本家の最終成功ビルドと同日）に固定した。同様に`zmk-module-ble-management`も新しいAPI依存が入る前のコミット（Step 3で発掘済みの`2147ba7`）を継続使用。`zmk-module-settings-rpc`は該当するリスクのあるAPI呼び出しが無いことをソースで確認できたため`main`のまま使用。
+
+### 対応内容
+
+- `config/west.yml`: `zmk`を`v0.3-branch+dya`に変更。`zmk-module-ble-management`（`2147ba7`固定）・`zmk-module-settings-rpc`（`main`）・`zmk-module-runtime-input-processor`（`dbf92f7`固定）を追加。
+- `torabo_tsuki_lp_left.conf`・`torabo_tsuki_lp_right.conf`: 本家の設定に合わせて`CONFIG_BT_MAX_CONN=5`・`CONFIG_BT_MAX_PAIRED=5`・`CONFIG_ZMK_BLE_MANAGEMENT=y`・`CONFIG_ZMK_BATTERY_SKIP_IF_USB_POWERED=n`・`CONFIG_ZMK_SETTINGS_RPC=y`・`CONFIG_ZMK_SPLIT_RELAY_EVENT=y`・`CONFIG_ZMK_SPLIT_BLE_CENTRAL_SPLIT_RUN_STACK_SIZE=768`・`CONFIG_ZMK_SETTINGS_SAVE_DEBOUNCE=10000`を設定。
+- `snippets/split-central/split-central.conf`: centralロール専用のStudio RPC設定（`CONFIG_ZMK_RUNTIME_INPUT_PROCESSOR=y`等4行）を追加。
+- `torabo_tsuki_lp_right.overlay`: トラックボール用`trackball_speed_rip`ノードとpointing_listenerへの組み込みを復活（既存のレイヤー別scroll-snap設定は維持、既定値1/1で速度は変えない）。
+- `snippets/input-split-listener/input-split-listener.overlay`: トラックパッド用`trackpad_speed_rip`ノードを同様に復活。
+- `CONFIG_ZMK_IDLE_SLEEP_TIMEOUT`（12時間、独自カスタマイズ）は変更していない。ただし`zmk-module-settings-rpc`はDYA Studio経由でアイドル/スリープタイムアウトを実行時変更できる機能を提供する（`zmk_activity_set_idle_ms`/`set_sleep_ms`）ため、Web UI側でうっかり変更されないよう留意（設定を変えた場合は本家配線と同様に手元の`.conf`のデフォルトへ差分が出る点は許容）。
+
+**結果:**（次回のpush・実機検証待ち）

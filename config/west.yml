@@ -9,22 +9,34 @@ manifest:
     - name: cormoran
       url-base: https://github.com/cormoran
   projects:
-    # DYA Studio(Level 2)対応のため、公式ZMK v0.3ではなくcormoran氏のフォーク
-    # （v0.3タグ + Custom Studio Protocol + BLE管理拡張の追加的パッチ）を使用。
-    # Zephyrのバージョンは公式v0.3と同一(v3.5.0+zmk-fixes)で、split/BLE/studio関連の
-    # 追加のみのためドライバ・他社製モジュールへの影響は小さいと判断（詳細はmemos参照）。
+    # DYA Studio(Level 2)対応のため、公式ZMK v0.3ではなくcormoran氏のフォークを使用。
+    # 当初はv0.3-branch+custom-studio-protocol+bleを自己判断で選定したが、実機で
+    # 接続不安定・タイムアウト等の問題が発生した。torabo-tsuki-lp本家(sekigon-gonnoc)に
+    # 実際にDYA Studio対応済みブランチ(v0.3+dya-studio)が存在することが判明し、
+    # そちらが使っているv0.3-branch+dyaに変更した。本家が実機検証済みの構成であり、
+    # 以下のモジュール群もこの組み合わせで動作確認されている
+    # （参考: https://github.com/sekigon-gonnoc/zmk-keyboard-torabo-tsuki-lp/tree/v0.3+dya-studio
+    #  詳細はmemos/dya-studio-integration.md）。
     - name: zmk
       remote: cormoran
-      revision: v0.3-branch+custom-studio-protocol+ble
+      revision: v0.3-branch+dya
       import: app/west.yml
-    # DYA Studio Level 2: BLEプロファイルの一覧表示・名前付け・切替・ペア解除をWeb UIから。
-    # mainブランチHEADは zmk_endpoint_get/set_preferred_transport（単数形）を呼ぶが、
-    # このキーボードが使うZMKフォークには zmk_endpoints_get_preferred_transport等
-    # （複数形）しか無くリンクエラーになる。複数形呼び出しに直した最後のコミットに固定
-    # （詳細はmemos/dya-studio-integration.md）。
+    # DYA Studio Level 2: BLEプロファイル管理・設定同期・トラックボール速度調整。
+    # zmk-module-ble-management・zmk-module-runtime-input-processorは、mainブランチ
+    # HEADが（DYA本体が使う）ZMK本家main相当のより新しいコアAPI
+    # （zmk_keymap_layer_activateの2引数版、zmk_endpoint_*の単数形命名等）に依存して
+    # おり、v0.3ベースの本フォークとはリンクエラーになるため、両モジュールともその
+    # 変更が入る前のコミットに固定している（詳細はmemos/dya-studio-integration.md）。
+    # zmk-module-settings-rpcはそのようなAPIを使っておらずmainのままで問題ない。
     - name: zmk-module-ble-management
       remote: cormoran
       revision: 2147ba7d329253ef9d0cfe4c6b814add7915225c
+    - name: zmk-module-settings-rpc
+      remote: cormoran
+      revision: main
+    - name: zmk-module-runtime-input-processor
+      remote: cormoran
+      revision: dbf92f764de8b6ffd60bf5850514302875fe2570
     - name: zmk-component-bmp-boost
       remote: sekigon-gonnoc
       import: west.yml
