@@ -11,7 +11,7 @@
     // 同種インスタンスは input-split-listener スニペット側で定義している。
     trackball_speed_rip: trackball_speed_rip {
         compatible = "zmk,input-processor-runtime";
-        processor-label = "trackball";
+        processor-label = "tball"; // CONFIG_ZMK_RUNTIME_INPUT_PROCESSOR_NAME_MAX_LEN(既定8文字)制限のため短縮
         type = <INPUT_EV_REL>;
         x-codes = <INPUT_REL_X>;
         y-codes = <INPUT_REL_Y>;

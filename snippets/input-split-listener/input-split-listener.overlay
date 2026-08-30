@@ -15,7 +15,7 @@
     // （既定は1/1=補正なしで既存のスケール値を変えない）
     trackpad_speed_rip: trackpad_speed_rip {
         compatible = "zmk,input-processor-runtime";
-        processor-label = "trackpad";
+        processor-label = "tpad"; // CONFIG_ZMK_RUNTIME_INPUT_PROCESSOR_NAME_MAX_LEN(既定8文字)制限のため短縮
         type = <INPUT_EV_REL>;
         x-codes = <INPUT_REL_X>;
         y-codes = <INPUT_REL_Y>;
