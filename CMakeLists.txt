@@ -10,3 +10,10 @@ endif()
 # のためこのライブラリにしかスコープされず、他モジュール(zmk-feature-device-info)
 # のソースからは見えなかった（詳細はmemos/dya-studio-integration.md）。
 zephyr_include_directories(${CMAKE_CURRENT_LIST_DIR}/include)
+
+# DYA Studio対応: zmk-feature-device-infoはCONFIG_BOARDを文字列マクロとして
+# 直接参照するが、bmp_boostボードは（新しいhardware model v2ではなく）
+# 旧来のKconfig.board形式（CONFIG_BOARD_BMP_BOOSTという真偽値）で定義されて
+# おり、CONFIG_BOARD文字列マクロ自体が生成されない。CMakeのBOARD変数から
+# 文字列マクロとして補う（詳細はmemos/dya-studio-integration.md）。
+zephyr_compile_definitions(CONFIG_BOARD="${BOARD}")
