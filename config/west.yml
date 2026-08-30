@@ -56,7 +56,10 @@ manifest:
     # zmk-feature-device-infoもmainブランチHEADは同様にzephyr_linker_sources(ROM_SECTIONS
     # ...)（GNU build-idをビルドに埋め込む機能）を使い非互換なため、その機能が入る前の
     # コミットに固定。device-infoはZMKコアAPIを一切呼ばないため機能面での実質的な差分は
-    # build-id埋め込みのみ（詳細はmemos/dya-studio-integration.md）。
+    # build-id埋め込みのみ。なお#include <zephyr/version.h>もこのZephyrバージョンには
+    # 存在しないパスで（新旧どのコミットでも共通）、リポジトリ直下の
+    # include/zephyr/version.h の互換シムで解決している
+    # （詳細はmemos/dya-studio-integration.md）。
     - name: zmk-feature-device-info
       remote: cormoran
       revision: b1bb753608c3d57a8071419405eb8b3b4bd5a961
