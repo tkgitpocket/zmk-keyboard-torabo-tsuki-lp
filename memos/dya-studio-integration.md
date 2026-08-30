@@ -319,3 +319,33 @@ CIビルドは複数回失敗と修正を繰り返した末に成功した。時
    **対応:** 日付ではなく実際のmainブランチのコミットグラフを辿り、ROM_SECTIONSを導入したマージコミット（`d1b664434`）の**直前の親コミット**（`5be86dcfb903ecc12624b02cadb40bbdbc78abe3`、7/7 19:02、"Document opaque-blob keyspaces..."）に固定。これは「ROM_SECTIONS導入前にmainへマージされていた全ての変更を含む、最後の状態」を機械的に特定する方法であり、個別のコミットを日付で拾うより確実。`runtime-combo`が参照するcustom-settingsの全シンボル・マクロ（26個）の存在を`grep`で一括確認してから採用。
 
 **教訓:** 活発に並行開発されているリポジトリ（同日に複数のPRが別ブランチでマージされているようなケース）では、「特定の日付以降のコミット」を単純に選ぶのは危険。`git merge-base --is-ancestor`で実際の祖先関係を確認するか、目的のマージコミットの直前の親コミットを使うのが確実。
+
+## 実機検証結果とMacro/Combo tabが空だった理由（2026-08-30）
+
+実機検証で以下が判明:
+
+- **接続・安定性は良好。** トラックボール調整も問題なし。
+- **Combo/Macroタブは表示されるが空。** `zmk-feature-runtime-combo`/`zmk-feature-runtime-macro`が提供する「Runtime Combo/Macro」は、`config/keymap.keymap`に静的定義している既存の`combos { }`/`macros { }`ノードとは**別物の独立したシステム**で、Studioは静的devicetree定義を読み取れない。既存の静的コンボ・マクロは今まで通りそのまま動作するが、Studio側で管理したい場合はWeb UI上で改めて作り直す必要がある（自動インポートは不可）。
+
+## 追加モジュール: マクロ編集・診断用devtool（2026-08-30）
+
+ユーザー要望により追加。
+
+### zmk-feature-runtime-macro
+
+`config ZMK_RUNTIME_MACRO` は `select ZMK_CUSTOM_SETTINGS` で依存するが、mainブランチHEADは custom-settings を keyspace 方式のストレージへ作り直した後のAPI（`zmk_custom_settings_notify_suppress_begin/end` 等）を使っており、固定済みのcustom-settingsコミット（`5be86dc`）には存在しない。
+
+調査の結果、そのストレージ書き換えコミット（`3262a1f`、2026-07-08 "Rebuild macro storage on custom-settings keyspaces"）の直前（`0a7c3bc`、2026-07-06 19:37 "Apply pre-commit formatting"）まで遡ると、`5be86dc`が持つ範囲のcustom-settings APIしか使わない実装になっていることを確認。使用シンボル・関数（`ZMK_CUSTOM_SETTING_DEFINE_POOLED`・`zmk_custom_setting_set_default`等、計20個超）を`grep`で一括照合し互換性を確認してから採用。`zmk_behavior_queue_add`もv0.3-branch+dyaに存在することを確認済み。
+
+**ビルドエラーとその対応:** `ZMK_RUNTIME_MACRO_MAX_BYTES`（既定256）の許容range上限が`ZMK_CUSTOM_SETTINGS_LARGE_VALUE_MAX_SIZE`（未設定だと既定64＝`ZMK_CUSTOM_SETTINGS_VALUE_MAX_SIZE`と同値）にクランプされ「Aborting due to Kconfig warnings」でビルド停止。`CONFIG_ZMK_CUSTOM_SETTINGS_LARGE_VALUE_MAX_SIZE=256`を明示設定して解消（この設定自体はDYA Studio開発者ガイドのSettingsページで示されていたが、当時Settingsモジュールを使っていなかったため未設定だった）。
+
+### zmk-module-devtool
+
+診断用ポップアップ（ログ表示・レイヤー状態確認・Studioロック状態の確認/切替）。mainブランチHEADで2つの非互換が判明、いずれも**最初のコミットから存在する問題でコミットを遡っても回避不可**:
+
+1. `devtool_layer.c`（`CONFIG_ZMK_DEVTOOL_LAYER_STATE`、デフォルト有効）が`zmk_keymap_layer_activate`/`_toggle`を2引数（`(layer, locking)`）で呼び、v0.3-branch+dyaの1引数版とリンクエラー。これまでと同種のコアAPI非互換。
+2. `devtool_logs.c`（`CONFIG_ZMK_DEVTOOL_LOG_CAPTURE`）が`log_msg_get_source_id()`・`LOG_OUTPUT_FLAG_SKIP_SOURCE`という、Zephyr `v3.5.0+zmk-fixes`のロギングサブシステムには存在しないAPI（より新しいZephyrで追加）を使用しコンパイルエラー。ROM_SECTIONSや`<zephyr/version.h>`と同種の「Zephyr自体のバージョン差」パターンだが、今回は単純なヘッダ転送シムでは直せない（関数の実装自体が必要）ため見送り。
+
+**対応:** `CONFIG_ZMK_DEVTOOL_LAYER_STATE=n`・`CONFIG_ZMK_DEVTOOL_LOG_CAPTURE=n`で両方無効化。**Studioのロック状態確認/切替のみ**が使えるdevtoolとして組み込んだ（`devtool_handler.c`のロック処理はこの2機能と独立で、影響を受けない）。
+
+CIビルドは複数回の修正を経て成功。実機での動作確認は次回のフラッシュ後。
