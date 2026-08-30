@@ -42,11 +42,15 @@ manifest:
     # custom-settingsのmainブランチHEADは内部でzephyr_linker_sources(ROM_SECTIONS ...)
     # を呼ぶが、ROM_SECTIONSはこのキーボードが使うZephyr v3.5.0+zmk-fixesの
     # extensions.cmakeには存在しない（より新しいZephyrで追加されたリンカ配置先）。
-    # ROM_SECTIONS移行前の最終コミットに固定（runtime-comboが呼ぶ全APIの存在は
+    # ROM_SECTIONS移行前の最終コミットに固定したいが、runtime-comboが使う
+    # ZMK_CUSTOM_SETTING_VALUE_TYPE_BEHAVIOR（コンボの動作をBEHAVIOR型の
+    # custom settingとして保存する機能）が入るのはROM_SECTIONS移行の
+    # 前日と、両者が非常に近い日程で追加されている。ROM_SECTIONSより前かつ
+    # BEHAVIOR型が入った後のコミットに固定（runtime-comboが呼ぶ全APIの存在は
     # 確認済み。詳細はmemos/dya-studio-integration.md）。
     - name: zmk-feature-custom-settings
       remote: cormoran
-      revision: 02cc69f210f96f0a1f9332c35fdef31890f42877
+      revision: 6be3e59e8616557e62653e9765d5a100c67748af
     - name: zmk-feature-runtime-combo
       remote: cormoran
       revision: main
