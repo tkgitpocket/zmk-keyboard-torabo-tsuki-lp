@@ -66,10 +66,14 @@ manifest:
     - name: zmk-feature-input-stream
       remote: cormoran
       revision: main
-    # DYA Studio: 診断用ポップアップ(ログ表示・Studioロック状態の確認/切替)。
-    # devtool_layer.c(レイヤー状態の取得/切替RPC、デフォルト有効)はzmk_keymap_
-    # layer_activate/toggleを2引数で呼び、v0.3-branch+dyaとリンクエラーになる
-    # ため、CONFIG_ZMK_DEVTOOL_LAYER_STATE=nで明示的に無効化する
+    # DYA Studio: 診断用ポップアップ(Studioロック状態の確認/切替)。
+    # devtool_layer.c(レイヤー状態RPC、デフォルト有効)はzmk_keymap_layer_
+    # activate/toggleを2引数で呼びv0.3-branch+dyaとリンクエラーになるため
+    # CONFIG_ZMK_DEVTOOL_LAYER_STATE=nで無効化。devtool_logs.c(ログ表示)も
+    # log_msg_get_source_id/LOG_OUTPUT_FLAG_SKIP_SOURCEというこのZephyr
+    # バージョン(v3.5.0+zmk-fixes)には存在しないロギングAPIを使うため
+    # CONFIG_ZMK_DEVTOOL_LOG_CAPTURE=nで無効化。どちらも最初のコミットから
+    # このAPIを使っており、コミットを遡っても回避できない
     # （詳細はmemos/dya-studio-integration.md）。
     - name: zmk-module-devtool
       remote: cormoran
