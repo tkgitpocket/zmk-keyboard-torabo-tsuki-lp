@@ -293,3 +293,29 @@ USBが一覧には出るが繋がらない件も、DYA Studioクライアント�
 - `snippets/split-central/split-central.conf`: `CONFIG_ZMK_RUNTIME_COMBO=y`・`CONFIG_ZMK_RUNTIME_COMBO_STUDIO_RPC=y`・`CONFIG_ZMK_CUSTOM_SETTINGS_SPLIT_RPC_RELAY=y`・`CONFIG_ZMK_INPUT_STREAM_FEATURE=y`・`CONFIG_ZMK_INPUT_STREAM_FEATURE_STUDIO_RPC=y`・`CONFIG_ZMK_DEVICE_INFO=y`・`CONFIG_ZMK_DEVICE_INFO_STUDIO_RPC=y`を追加（他のStudio RPC機能と同様central専用）。
 
 （Combo評価は分割キーボードでも常にcentral側で行われるため、peripheral側の設定は不要という理解。実機で要検証。）
+
+### ビルド試行錯誤の詳細（2026-08-30）
+
+CIビルドは複数回失敗と修正を繰り返した末に成功した。時系列で記録する。
+
+1. **`CONFIG_ZMK_BATTERY_SKIP_IF_USB_POWERED=n`が未定義シンボル。** `zmk-module-battery-history`を導入していないため存在しないシンボル。削除して対応（これは前段のv0.3-branch+dya移行時の修正、Combo追加より前）。
+
+2. **`zmk-feature-device-info`のmainブランチHEADが`zephyr_linker_sources(ROM_SECTIONS ...)`（GNU build-id埋め込み）を使い、custom-settingsと同じ理由でビルドエラー。** この機能が入る前のコミット`b1bb7536`（"Implement ZMK device info module"、2026-05-06、モジュールの最初の実装コミット）に固定。device-infoはZMKコアAPIを一切呼ばないため機能面の差分はbuild-id埋め込みのみ。
+
+3. **`b1bb7536`でも`#include <zephyr/version.h>`が見つからずビルドエラー。** これは新旧どのコミットにも共通する問題で、`main`に戻しても解決しない。このキーボードが使うZephyr `v3.5.0+zmk-fixes`は`include/generated/version.h`（`zephyr/`サブディレクトリなし）を生成する仕様で、`<zephyr/version.h>`というパス自体が存在しない（`zephyr/`プレフィックス付き生成ヘッダーは後のZephyrリリースで導入された規約）。
+   **対応:** リポジトリ直下に`include/zephyr/version.h`という互換シムを追加し、中身は`#include <version.h>`で実体に転送するだけ。`KERNEL_VERSION_*`マクロの定義形式自体はバージョンを問わず同一のため、転送だけで機能する。
+
+4. **シムを追加してもまだ同じエラー。** リポジトリの`CMakeLists.txt`にある既存の`zephyr_include_directories(${APPLICATION_SOURCE_DIR}/include)`は`zephyr_library()`呼び出し後のブロック内にあり、そのライブラリ（`board.c`等）にしかスコープされず、他モジュール（`zmk-feature-device-info`）のソースからはインクルードパスが見えていなかった。
+   **対応:** `zephyr_include_directories(${CMAKE_CURRENT_LIST_DIR}/include)`をトップレベル（`zephyr_library()`ブロックの外）で独立に呼び出す形に変更。これによりグローバルなインクルードパスとして反映され、`<zephyr/version.h>`のエラーは解消。
+
+5. **今度は`error: 'CONFIG_BOARD' undeclared`。** `zmk-feature-device-info`は`CONFIG_BOARD`を文字列マクロとして直接参照するが、`bmp_boost`ボードは（Zephyrの新しいhardware model v2ではなく）旧来のKconfig.board形式（`CONFIG_BOARD_BMP_BOOST`という真偽値、`zmk-component-bmp-boost`のKconfig.board参照）で定義されており、汎用の`CONFIG_BOARD`文字列マクロ自体が生成されない。
+   **対応:** `zephyr_compile_definitions(CONFIG_BOARD="${BOARD}")`をCMakeLists.txtに追加し、CMakeの`BOARD`変数（`-DBOARD=bmp_boost`としてビルド時に渡される）から文字列マクロを補った。
+
+6. **`zmk-feature-runtime-combo`（mainブランチHEAD）が`ZMK_CUSTOM_SETTING_VALUE_TYPE_BEHAVIOR`という、当時固定していたcustom-settingsのコミット（`02cc69f2`、2026-07-05朝）には無いenum値を参照しビルドエラー。**
+   調査の結果、この機能は`02cc69f2`の**同日の夜**（`6be3e59e`、7/5 18:38、"Add BEHAVIOR custom setting value type..."）に追加されたことが判明。ROM_SECTIONS導入（`d1b664434`、7/7）より前なので固定先を`6be3e59e`に変更。
+
+7. **`6be3e59e`に変更してもrun-comboが使う`ZMK_CUSTOM_SETTING_ARRAY_DEFINE`マクロが見つからず構文エラー。**
+   単純な日付ベースの選定が誤りだったと判明。このマクロを導入した`d2f97ae`（7/5 18:26付け、"P3: rework array settings..."）は`6be3e59e`より**日付上は早い**が、実際には`git merge-base --is-ancestor`で確認すると**別ブランチ**の変更で、`6be3e59e`の祖先ではなかった（並行して開発されていた別PRが、`6be3e59e`より後にmainへマージされていた）。author-dateだけで「この日以降のコミットなら入っているはず」と判断するのは、並行ブランチ開発をしているリポジトリでは通用しないことが判明。
+   **対応:** 日付ではなく実際のmainブランチのコミットグラフを辿り、ROM_SECTIONSを導入したマージコミット（`d1b664434`）の**直前の親コミット**（`5be86dcfb903ecc12624b02cadb40bbdbc78abe3`、7/7 19:02、"Document opaque-blob keyspaces..."）に固定。これは「ROM_SECTIONS導入前にmainへマージされていた全ての変更を含む、最後の状態」を機械的に特定する方法であり、個別のコミットを日付で拾うより確実。`runtime-combo`が参照するcustom-settingsの全シンボル・マクロ（26個）の存在を`grep`で一括確認してから採用。
+
+**教訓:** 活発に並行開発されているリポジトリ（同日に複数のPRが別ブランチでマージされているようなケース）では、「特定の日付以降のコミット」を単純に選ぶのは危険。`git merge-base --is-ancestor`で実際の祖先関係を確認するか、目的のマージコミットの直前の親コミットを使うのが確実。
