@@ -37,6 +37,25 @@ manifest:
     - name: zmk-module-runtime-input-processor
       remote: cormoran
       revision: dbf92f764de8b6ffd60bf5850514302875fe2570
+    # DYA Studio Level 2: Combo編集・キー入力ストリーム表示・機体情報表示。
+    # zmk-feature-runtime-comboはzmk-feature-custom-settingsに依存する。
+    # custom-settingsのmainブランチHEADは内部でzephyr_linker_sources(ROM_SECTIONS ...)
+    # を呼ぶが、ROM_SECTIONSはこのキーボードが使うZephyr v3.5.0+zmk-fixesの
+    # extensions.cmakeには存在しない（より新しいZephyrで追加されたリンカ配置先）。
+    # ROM_SECTIONS移行前の最終コミットに固定（runtime-comboが呼ぶ全APIの存在は
+    # 確認済み。詳細はmemos/dya-studio-integration.md）。
+    - name: zmk-feature-custom-settings
+      remote: cormoran
+      revision: 02cc69f210f96f0a1f9332c35fdef31890f42877
+    - name: zmk-feature-runtime-combo
+      remote: cormoran
+      revision: main
+    - name: zmk-feature-input-stream
+      remote: cormoran
+      revision: main
+    - name: zmk-feature-device-info
+      remote: cormoran
+      revision: main
     - name: zmk-component-bmp-boost
       remote: sekigon-gonnoc
       import: west.yml

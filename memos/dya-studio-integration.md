@@ -269,3 +269,27 @@ config ZMK_STUDIO_LOCK_BLE_DIRECT_ADVERTISING_ON_UNLOCK
 **対応:** `torabo_tsuki_lp_left.conf`・`torabo_tsuki_lp_right.conf`の`CONFIG_ZMK_STUDIO_LOCKING=n`を削除し、ロック機能を有効化。ユーザーが既にキーマップに追加済みの`&studio_unlock`（Bluetoothレイヤー、コミット`697edcd`）を接続前に押す運用に変更。これによりKeymapEditor等での「都度アンロック不要」という従来の利便性は失われるが、DYA Studio対応（特にBLE検出）とはトレードオフの関係にあるため、DYA Studio対応を優先した。
 
 USBが一覧には出るが繋がらない件も、DYA Studioクライアント側がトランスポート種別によらず共通で「アンロック待ち」のような扱いをしている可能性があり、この変更で合わせて改善するか実機で要確認。
+
+**実機検証結果: ✅ BLE接続成功。トラックボール調整タブも表示・動作確認済み。** ただし**USBは引き続き接続不可**（現象は未変化、切り分けは次回実施）。
+
+## 追加モジュール: Combo編集・キー入力ストリーム表示・機体情報表示（2026-08-30）
+
+ユーザー要望により以下3モジュールを追加:
+
+- [zmk-feature-runtime-combo](https://github.com/cormoran/zmk-feature-runtime-combo) — Comboタブ
+- [zmk-feature-input-stream](https://github.com/cormoran/zmk-feature-input-stream) — 押下キーのリアルタイム表示
+- [zmk-feature-device-info](https://github.com/cormoran/zmk-feature-device-info) — ファームウェア/機体情報表示
+
+`zmk-feature-runtime-combo`は`zmk-feature-custom-settings`（`select ZMK_CUSTOM_SETTINGS`）に依存する。このモジュールは以前（Step 3で断念した際）に調査済みで、`main`ブランチHEADが`zephyr_linker_sources(ROM_SECTIONS ...)`を呼ぶが、本リポジトリが使うZephyr `v3.5.0+zmk-fixes`の`extensions.cmake`には`ROM_SECTIONS`という配置先が存在せず（より新しいZephyrで追加された機能）ビルドが通らないため見送っていた。
+
+今回、`zmk-feature-custom-settings`のCMakeLists.txtの変更履歴を`git log -p`で遡り、`ROM_SECTIONS`が導入された直前のコミット（`d1b664434a5deeb4c43591547923c8cb77589373` "Split setting descriptors into const flash meta + compact RAM state"、2026-07-07）の1つ前のコミット `02cc69f210f96f0a1f9332c35fdef31890f42877`（"Add record (struct) settings via a per-field TLV encoding (P4)"、2026-07-05）を特定。このコミットは`DATA_SECTIONS`（本リポジトリのZephyrでも存在する配置先）を使っており互換性がある。
+
+`zmk-feature-runtime-combo`（現在のmain HEAD、2026-07-18）が呼び出す`zmk_custom_settings_*`関数10個すべてが、この`02cc69f2`時点の`custom_settings.h`に同一シグネチャで存在することを確認済み（`zmk_custom_settings_save_scope`/`_discard_scope`等）。またruntime-combo自身が使うZMKコアAPI（`zmk_behavior_*`・`zmk_keymap_highest_layer_active`）も`v0.3-branch+dya`に存在することを確認。
+
+`zmk-feature-input-stream`・`zmk-feature-device-info`は使用するZMKコアAPIを確認した結果、いずれも新しいコアAPIへの依存はなく`main`のままで問題ないと判断。
+
+**対応:**
+- `config/west.yml`: `zmk-feature-custom-settings`（`02cc69f2`固定）・`zmk-feature-runtime-combo`・`zmk-feature-input-stream`・`zmk-feature-device-info`（すべて`main`、custom-settingsのみ固定コミット）を追加。
+- `snippets/split-central/split-central.conf`: `CONFIG_ZMK_RUNTIME_COMBO=y`・`CONFIG_ZMK_RUNTIME_COMBO_STUDIO_RPC=y`・`CONFIG_ZMK_CUSTOM_SETTINGS_SPLIT_RPC_RELAY=y`・`CONFIG_ZMK_INPUT_STREAM_FEATURE=y`・`CONFIG_ZMK_INPUT_STREAM_FEATURE_STUDIO_RPC=y`・`CONFIG_ZMK_DEVICE_INFO=y`・`CONFIG_ZMK_DEVICE_INFO_STUDIO_RPC=y`を追加（他のStudio RPC機能と同様central専用）。
+
+（Combo評価は分割キーボードでも常にcentral側で行われるため、peripheral側の設定は不要という理解。実機で要検証。）
