@@ -54,7 +54,24 @@ manifest:
     - name: zmk-feature-runtime-combo
       remote: cormoran
       revision: main
+    # zmk-feature-runtime-macroのmainブランチHEADは、custom-settingsを
+    # keyspace方式のストレージへ作り直した後のAPI(zmk_custom_settings_notify_
+    # suppress_begin/end等)を使い、上のcustom-settings固定コミットには存在
+    # しない。そのストレージ書き換え(2026-07-08)より前、かつcustom-settings
+    # 固定コミットが要求する範囲のAPIしか使わないコミットに固定
+    # （詳細はmemos/dya-studio-integration.md）。
+    - name: zmk-feature-runtime-macro
+      remote: cormoran
+      revision: 0a7c3bcefb63f479fe0292aaff2301f2c0440543
     - name: zmk-feature-input-stream
+      remote: cormoran
+      revision: main
+    # DYA Studio: 診断用ポップアップ(ログ表示・Studioロック状態の確認/切替)。
+    # devtool_layer.c(レイヤー状態の取得/切替RPC、デフォルト有効)はzmk_keymap_
+    # layer_activate/toggleを2引数で呼び、v0.3-branch+dyaとリンクエラーになる
+    # ため、CONFIG_ZMK_DEVTOOL_LAYER_STATE=nで明示的に無効化する
+    # （詳細はmemos/dya-studio-integration.md）。
+    - name: zmk-module-devtool
       remote: cormoran
       revision: main
     # zmk-feature-device-infoもmainブランチHEADは同様にzephyr_linker_sources(ROM_SECTIONS
