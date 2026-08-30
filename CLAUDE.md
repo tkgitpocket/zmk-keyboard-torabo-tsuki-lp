@@ -146,7 +146,7 @@ src/
 
 [DYA Studio](https://studio.dya.cormoran.works/)（cormoran氏開発のZMK Studio互換Web UI）への対応状況。詳細な調査記録・試行錯誤の経緯は [memos/dya-studio-integration.md](memos/dya-studio-integration.md) を参照。
 
-- **Level 1（キー割り当て・レイヤー名・物理レイアウト切替）**: 対応済み。`CONFIG_ZMK_STUDIO=y`・`CONFIG_ZMK_STUDIO_LOCKING=n`・`studio-rpc-usb-uart`スニペット・`keys`付き物理レイアウト定義は元々揃っており、USB接続で標準ZMK Studio互換のRPCが動作する。
+- **Level 1（キー割り当て・レイヤー名・物理レイアウト切替）**: 対応済み。`CONFIG_ZMK_STUDIO=y`・`studio-rpc-usb-uart`スニペット・`keys`付き物理レイアウト定義は元々揃っており、USB接続で標準ZMK Studio互換のRPCが動作する。なお`CONFIG_ZMK_STUDIO_LOCKING`は以前`n`（常時アンロック）にしていたが、DYA StudioがBLE検出にロック解除“動作”をトリガーとして使うため有効化に戻した。接続前にBluetoothレイヤーの`&studio_unlock`を押す必要がある（詳細は[memos/dya-studio-integration.md](memos/dya-studio-integration.md)）。
 - **Level 2（BLEプロファイル管理）**: 対応済み。`zmk-module-ble-management`を追加し、`torabo_tsuki_lp_right.conf`に`CONFIG_ZMK_BLE_MANAGEMENT=y`・`CONFIG_ZMK_BLE_MANAGEMENT_STUDIO_RPC=y`を設定。
 - **Level 2（トラックボール/トラックパッド速度調整、per-OSデフォルトレイヤー）**: 見送り。`zmk-module-runtime-input-processor`・`zmk-feature-default-layer`（Studio RPC対応版）はいずれもZMK本家`main`ブランチ（DYA本体が使う`main+dya`相当）の新しいコアAPI（`zmk_keymap_layer_activate`の2引数版、`zmk_endpoint_get_selected`等の単数形関数名）に依存しており、このリポジトリが使うv0.3ベースのZMKフォークとリンクエラーになるため断念した。既存の`out_bt_0`〜`out_bt_4`マクロによるBTプロファイル別デフォルトレイヤー切替をそのまま維持している。
 

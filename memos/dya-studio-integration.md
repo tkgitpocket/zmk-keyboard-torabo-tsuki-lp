@@ -245,4 +245,27 @@ CIにpushする前にソースレビューで判明したため、実際のビ�
 
 なお`CONFIG_ZMK_SPLIT_BLE_CENTRAL_SPLIT_RUN_STACK_SIZE`・`CONFIG_ZMK_POINTING_SMOOTH_SCROLLING`のような「centralロール専用設定をperipheral側の.confにも書いてしまっている」役割不一致のKconfig警告は、本家リポジトリも同じパターンで実際にビルドが通っていることから**非致命的（ビルドを止めない）**と判明。「Kconfig警告=即ビルド失敗」ではなく、未定義シンボルへの代入など一部の警告のみが実際にfatalになる模様。
 
-**実機での動作確認（接続・安定性とも）は次回のフラッシュ後にユーザーに確認してもらう。**
+**実機での動作確認結果:** 安定性は問題なし。ただしDYA Studioへの接続は依然失敗（USBは一覧に出るが繋がらず、BLEは一覧にすら出ない）。
+
+## 根本原因判明: `CONFIG_ZMK_STUDIO_LOCKING=n`がBLE検出を妨げていた（2026-08-30）
+
+`v0.3-branch+dya`の`app/src/studio/Kconfig`・`core.c`を確認したところ、次の仕組みが判明した:
+
+```
+config ZMK_STUDIO_LOCK_BLE_DIRECT_ADVERTISING_ON_UNLOCK
+    bool "Enable Directed Advertising on Unlock"
+    default y if ZMK_STUDIO_LOCKING && ZMK_BLE
+    help
+      When enabled, the keyboard will enable directed advertising to active profile
+      during unlock. It's required to detect device from web bluetooth API for some browsers.
+```
+
+`zmk_studio_core_unlock()`（`&studio_unlock`バインディング実行時に呼ばれる）が、この設定が有効な場合にのみ`zmk_ble_set_directed_advertising(true)`を呼んでBLE広告を開始する。この設定のデフォルトは`ZMK_STUDIO_LOCKING`が有効な場合のみ`y`になる。
+
+本リポジトリは以前から（DYA Studio対応より前から）`CONFIG_ZMK_STUDIO_LOCKING=n`（常時アンロック、KeymapEditor等での利便性のため）に設定していた。この場合`zmk_studio_core_unlock()`自体が一度も呼ばれない（起動時から既にunlocked状態のため、ロック→アンロックの"遷移"が発生しない）ため、BLE広告のトリガーが一度も発生しない。**これがBLEで一覧にすら出ない直接の原因。**
+
+本家(sekigon-gonnoc)のDYA Studio対応ブランチでは`CONFIG_ZMK_STUDIO_LOCKING=n`ではなく単にコメントアウト（＝デフォルトの有効状態）になっており、この差異に対応していなかったことが今回の見落としだった。
+
+**対応:** `torabo_tsuki_lp_left.conf`・`torabo_tsuki_lp_right.conf`の`CONFIG_ZMK_STUDIO_LOCKING=n`を削除し、ロック機能を有効化。ユーザーが既にキーマップに追加済みの`&studio_unlock`（Bluetoothレイヤー、コミット`697edcd`）を接続前に押す運用に変更。これによりKeymapEditor等での「都度アンロック不要」という従来の利便性は失われるが、DYA Studio対応（特にBLE検出）とはトレードオフの関係にあるため、DYA Studio対応を優先した。
+
+USBが一覧には出るが繋がらない件も、DYA Studioクライアント側がトランスポート種別によらず共通で「アンロック待ち」のような扱いをしている可能性があり、この変更で合わせて改善するか実機で要確認。
